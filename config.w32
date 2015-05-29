@@ -1,0 +1,8 @@
+// $ Id: $
+// vim:ft=javascript
+
+ARG_ENABLE('wcli' , 'Add support for WCLI Win32 console enhancer', 'no');
+if (PHP_WCLI == "yes") {
+  EXTENSION("wcli", "wcli.c");
+  AC_DEFINE("HAVE_WCLI", 1, "wcli support");
+}
