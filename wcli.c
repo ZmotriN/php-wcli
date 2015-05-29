@@ -147,6 +147,7 @@ const zend_function_entry wcli_functions[] = {
 	PHP_FE(wcli_inverse_colors, NULL)
 	PHP_FE(wcli_reset_colors, NULL)
 	PHP_FE(wcli_default_colors, NULL)
+	PHP_FALIAS(wcli_restore_colors, wcli_reset_colors, NULL)
 	
 	PHP_FE(wcli_show_cursor, NULL)
 	PHP_FE(wcli_hide_cursor, NULL)
