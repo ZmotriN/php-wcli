@@ -68,6 +68,7 @@ DWORD get_parent_pid();
 HWND  get_console_window_handle();
 BOOL  is_cmd_call();
 unsigned char get_key();
+unsigned char get_global_key();
 BOOL  UTF8ToUnicode16(CHAR *in_Src, WCHAR *out_Dst, INT in_MaxLen);
 BOOL activate_window(HWND whnd);
 
@@ -78,14 +79,21 @@ PHP_FUNCTION(wcli_get_window_handle);
 PHP_FUNCTION(wcli_get_cp);
 PHP_FUNCTION(wcli_set_cp);
 
+
 PHP_FUNCTION(wcli_get_console_title);
 PHP_FUNCTION(wcli_set_console_title);
 
 PHP_FUNCTION(wcli_get_console_size);
 PHP_FUNCTION(wcli_set_console_size);
 
+PHP_FUNCTION(wcli_get_buffer_size);
+PHP_FUNCTION(wcli_set_buffer_size);
+
 PHP_FUNCTION(wcli_clear);
 PHP_FUNCTION(wcli_clear_line);
+PHP_FUNCTION(wcli_get_block);
+PHP_FUNCTION(wcli_get_line);
+
 
 PHP_FUNCTION(wcli_get_foreground_color);
 PHP_FUNCTION(wcli_set_foreground_color);
@@ -97,6 +105,8 @@ PHP_FUNCTION(wcli_inverse_colors);
 PHP_FUNCTION(wcli_reset_colors);
 PHP_FUNCTION(wcli_default_colors);
 
+
+PHP_FUNCTION(wcli_restore_init);
 PHP_FUNCTION(wcli_show_cursor);
 PHP_FUNCTION(wcli_hide_cursor);
 PHP_FUNCTION(wcli_get_cursor_visibility);
@@ -105,10 +115,13 @@ PHP_FUNCTION(wcli_get_cursor_size);
 PHP_FUNCTION(wcli_set_cursor_size);
 PHP_FUNCTION(wcli_get_cursor_position);
 PHP_FUNCTION(wcli_set_cursor_position);
+PHP_FUNCTION(wcli_get_font_size);
+PHP_FUNCTION(wcli_move);
 
 PHP_FUNCTION(wcli_echo);
 PHP_FUNCTION(wcli_print);
 PHP_FUNCTION(wcli_get_key);
+PHP_FUNCTION(wcli_get_global_key);
 PHP_FUNCTION(wcli_get_mouse_click);
 PHP_FUNCTION(wcli_flush_input_buffer);
 
@@ -128,6 +141,11 @@ PHP_FUNCTION(wcli_set_position);
 PHP_FUNCTION(wcli_get_clipboard);
 PHP_FUNCTION(wcli_set_clipboard);
 PHP_FUNCTION(wcli_empty_clipboard);
+
+PHP_FUNCTION(wcli_set_wnd_ontop);
+PHP_FUNCTION(wcli_get_foreground_wnd_title);
+
+PHP_FUNCTION(wcli_system_metric);
 
 PHP_FUNCTION(wcli_test);
 

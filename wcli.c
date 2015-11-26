@@ -14,6 +14,12 @@
   +----------------------------------------------------------------------+
   | Author: Maxime Larrivée-Roy <zmotrin@gmail.com>                                |
   +----------------------------------------------------------------------+
+
+  TODO:
+  - wcli_fill_color
+
+
+
 */
 
 #ifdef HAVE_CONFIG_H
@@ -52,20 +58,118 @@ static void php_wcli_init_globals(zend_wcli_globals *wcli_globals) {}
  */
 PHP_MINIT_FUNCTION(wcli)
 {
-	REGISTER_LONG_CONSTANT("Red", FOREGROUND_RED, CONST_CS|CONST_PERSISTENT);
-	REGISTER_LONG_CONSTANT("Green", FOREGROUND_GREEN, CONST_CS|CONST_PERSISTENT);
-	REGISTER_LONG_CONSTANT("Blue", FOREGROUND_BLUE, CONST_CS|CONST_PERSISTENT);
-	REGISTER_LONG_CONSTANT("Bright", FOREGROUND_INTENSITY, CONST_CS|CONST_PERSISTENT);
+	// COLORS
+	REGISTER_LONG_CONSTANT("Red",    FOREGROUND_RED, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("Green",  FOREGROUND_GREEN, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("Blue",   FOREGROUND_BLUE, CONST_CS|CONST_PERSISTENT);
 	REGISTER_LONG_CONSTANT("Yellow", FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_INTENSITY, CONST_CS|CONST_PERSISTENT);
 	REGISTER_LONG_CONSTANT("Purple", FOREGROUND_RED|FOREGROUND_BLUE, CONST_CS|CONST_PERSISTENT);
-	REGISTER_LONG_CONSTANT("Aqua", FOREGROUND_GREEN|FOREGROUND_BLUE, CONST_CS|CONST_PERSISTENT);
-	REGISTER_LONG_CONSTANT("White", FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE, CONST_CS|CONST_PERSISTENT);
-	REGISTER_LONG_CONSTANT("Black", 0x00, CONST_CS|CONST_PERSISTENT);
-	REGISTER_LONG_CONSTANT("Grey", FOREGROUND_INTENSITY, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("Aqua",   FOREGROUND_GREEN|FOREGROUND_BLUE, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("White",  FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("Black",  0x00, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("Grey",   FOREGROUND_INTENSITY, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("Bright", FOREGROUND_INTENSITY, CONST_CS|CONST_PERSISTENT);
 
-  ZEND_INIT_MODULE_GLOBALS(wcli, php_wcli_init_globals, NULL);
-  //REGISTER_INI_ENTRIES();
-  return SUCCESS;
+	// METRICS: https://msdn.microsoft.com/en-ca/library/windows/desktop/ms724385(v=vs.85).aspx
+	REGISTER_LONG_CONSTANT("SM_ARRANGE",                     0x0038, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CLEANBOOT",                   0x0043, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CMONITORS",                   0x0050, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CMOUSEBUTTONS",               0x002b, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CONVERTIBLESLATEMODE",        0x2003, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXBORDER",                    0x0005, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXCURSOR",                    0x000d, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXDLGFRAME",                  0x0007, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXDOUBLECLK",                 0x0024, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXDRAG",                      0x0044, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXEDGE",                      0x002d, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXFIXEDFRAME",                0x0007, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXFOCUSBORDER",               0x0053, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXFRAME",                     0x0020, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXFULLSCREEN",                0x0010, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXHSCROLL",                   0x0015, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXHTHUMB",                    0x000a, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXICON",                      0x000b, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXICONSPACING",               0x0026, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXMAXIMIZED",                 0x003d, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXMAXTRACK",                  0x003b, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXMENUCHECK",                 0x0047, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXMENUSIZE",                  0x0036, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXMIN",                       0x001c, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXMINIMIZED",                 0x0039, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXMINSPACING",                0x002f, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXMINTRACK",                  0x0022, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXPADDEDBORDER",              0x005c, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXSCREEN",                    0x0000, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXSIZE",                      0x001e, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXSIZEFRAME",                 0x0020, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXSMICON",                    0x0031, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXSMSIZE",                    0x0034, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXVIRTUALSCREEN",             0x004e, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CXVSCROLL",                   0x0002, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYBORDER",                    0x0006, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYCAPTION",                   0x0004, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYCURSOR",                    0x000e, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYDLGFRAME",                  0x0008, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYDOUBLECLK",                 0x0025, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYDRAG",                      0x0045, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYEDGE",                      0x002e, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYFIXEDFRAME",                0x0008, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYFOCUSBORDER",               0x0054, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYFRAME",                     0x0021, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYFULLSCREEN",                0x0011, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYHSCROLL",                   0x0003, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYICON",                      0x000c, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYICONSPACING",               0x0027, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYKANJIWINDOW",               0x0012, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYMAXIMIZED",                 0x003e, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYMAXTRACK",                  0x003c, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYMENU",                      0x000f, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYMENUCHECK",                 0x0048, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYMENUSIZE",                  0x0037, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYMIN",                       0x001d, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYMINIMIZED",                 0x003a, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYMINSPACING",                0x0030, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYMINTRACK",                  0x0023, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYSCREEN",                    0x0001, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYSIZE",                      0x001f, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYSIZEFRAME",                 0x0021, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYSMCAPTION",                 0x0033, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYSMICON",                    0x0032, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYSMSIZE",                    0x0035, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYVIRTUALSCREEN",             0x004f, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYVSCROLL",                   0x0014, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_CYVTHUMB",                    0x0009, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_DBCSENABLED",                 0x002a, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_DEBUG",                       0x0016, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_DIGITIZER",                   0x005e, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_IMMENABLED",                  0x0052, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_MAXIMUMTOUCHES",              0x005f, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_MEDIACENTER",                 0x0057, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_MENUDROPALIGNMENT",           0x0028, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_MIDEASTENABLED",              0x004a, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_MOUSEPRESENT",                0x0013, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_MOUSEHORIZONTALWHEELPRESENT", 0x005b, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_MOUSEWHEELPRESENT",           0x004b, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_NETWORK",                     0x003f, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_PENWINDOWS",                  0x0029, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_REMOTECONTROL",               0x2001, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_REMOTESESSION",               0x1000, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_SAMEDISPLAYFORMAT",           0x0051, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_SECURE",                      0x002c, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_SERVERR2",                    0x0059, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_SHOWSOUNDS",                  0x0046, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_SHUTTINGDOWN",                0x2000, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_SLOWMACHINE",                 0x0049, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_STARTER",                     0x0058, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_SWAPBUTTON",                  0x0017, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_SYSTEMDOCKED",                0x2004, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_TABLETPC",                    0x0056, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_XVIRTUALSCREEN",              0x004c, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("SM_YVIRTUALSCREEN",              0x004d, CONST_CS|CONST_PERSISTENT);
+	
+	
+	ZEND_INIT_MODULE_GLOBALS(wcli, php_wcli_init_globals, NULL);
+	return SUCCESS;
 }
 
 
@@ -131,10 +235,18 @@ const zend_function_entry wcli_functions[] = {
 
 	PHP_FE(wcli_clear, NULL)
 	PHP_FE(wcli_clear_line, NULL)
+	PHP_FE(wcli_get_block, NULL)
+	PHP_FE(wcli_get_line, NULL)
+	
+	
 
 	PHP_FE(wcli_get_console_title, NULL)
 	PHP_FE(wcli_set_console_title, NULL)
 
+	PHP_FE(wcli_get_buffer_size, NULL)
+	PHP_FE(wcli_set_buffer_size, NULL)
+
+	
 	PHP_FE(wcli_get_console_size, NULL)
 	PHP_FE(wcli_set_console_size, NULL)
 
@@ -149,6 +261,7 @@ const zend_function_entry wcli_functions[] = {
 	PHP_FE(wcli_default_colors, NULL)
 	PHP_FALIAS(wcli_restore_colors, wcli_reset_colors, NULL)
 	
+	PHP_FE(wcli_restore_init, NULL)
 	PHP_FE(wcli_show_cursor, NULL)
 	PHP_FE(wcli_hide_cursor, NULL)
 	PHP_FE(wcli_get_cursor_visibility, NULL)
@@ -157,16 +270,28 @@ const zend_function_entry wcli_functions[] = {
 	PHP_FE(wcli_set_cursor_size, NULL)
 	PHP_FE(wcli_get_cursor_position, NULL)
 	PHP_FE(wcli_set_cursor_position, NULL)
+	PHP_FALIAS(wcli_moveto, wcli_set_cursor_position, NULL)
+	PHP_FE(wcli_move, NULL)
 	
+	// TODO: wcli_set_font_size
+	PHP_FE(wcli_get_font_size, NULL)
+	
+
+
+
 	PHP_FE(wcli_echo, NULL)
 	PHP_FE(wcli_print, NULL)
 	PHP_FE(wcli_get_key, NULL)
+	PHP_FE(wcli_get_global_key, NULL)
 	PHP_FE(wcli_get_mouse_click, NULL)
 	PHP_FE(wcli_flush_input_buffer, NULL)
 	PHP_FALIAS(wcli_getch, wcli_get_key, NULL)
+	PHP_FALIAS(getch, wcli_get_key, NULL)
+
 
 	PHP_FE(wcli_get_parent_pid, NULL)
 	PHP_FE(wcli_is_cmd_call, NULL)
+
 
 	PHP_FE(wcli_is_ontop, NULL)
 	PHP_FE(wcli_is_visible, NULL)
@@ -181,6 +306,13 @@ const zend_function_entry wcli_functions[] = {
 	PHP_FE(wcli_get_clipboard, NULL)
 	PHP_FE(wcli_set_clipboard, NULL)
 	PHP_FE(wcli_empty_clipboard, NULL)
+
+
+	PHP_FE(wcli_set_wnd_ontop, NULL)
+	PHP_FE(wcli_get_foreground_wnd_title, NULL)
+	
+	PHP_FE(wcli_system_metric, NULL)
+
 
 	PHP_FE(wcli_test, NULL)
 
@@ -240,6 +372,17 @@ PHP_FUNCTION(wcli_get_window_handle) {
 // ********************************************************************
 
 
+PHP_FUNCTION(wcli_restore_init) {
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	WCLI_G(cursor).bVisible = TRUE;
+	WCLI_G(cursor).dwSize = 25;
+	WCLI_G(screen).wAttributes = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
+	if(!SetConsoleTextAttribute(WCLI_G(chnd), WCLI_G(screen).wAttributes)) RETURN_BOOL(0);
+	if(!SetConsoleCursorInfo(WCLI_G(chnd),&WCLI_G(cursor))) RETURN_BOOL(0);
+	RETURN_BOOL(1);
+}
+
+
 PHP_FUNCTION(wcli_get_console_size) {
 	CONSOLE_SCREEN_BUFFER_INFO info;
 	if(!WCLI_G(console)) RETURN_BOOL(0);
@@ -248,6 +391,7 @@ PHP_FUNCTION(wcli_get_console_size) {
 	add_index_long(return_value, 0, info.srWindow.Right - info.srWindow.Left + 1);
 	add_index_long(return_value, 1, info.srWindow.Bottom - info.srWindow.Top + 1);
 }
+
 
 PHP_FUNCTION(wcli_set_console_size) {
 	CONSOLE_SCREEN_BUFFER_INFO info;
@@ -283,6 +427,32 @@ PHP_FUNCTION(wcli_set_console_size) {
 	if(!SetConsoleScreenBufferSize(WCLI_G(chnd),bsize)) RETURN_BOOL(0);
 	RETURN_BOOL(1);
 }
+
+
+PHP_FUNCTION(wcli_get_buffer_size) {
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd),&info)) RETURN_BOOL(0);
+	array_init(return_value);
+	add_index_long(return_value, 0, info.dwSize.X);
+	add_index_long(return_value, 1, info.dwSize.Y);
+}
+
+
+PHP_FUNCTION(wcli_set_buffer_size) {
+	SHORT w, h;
+	COORD bsize;
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ll", &w, &h) == FAILURE) RETURN_BOOL(0);
+	bsize.X = w;
+	bsize.Y = h;
+	if(!SetConsoleScreenBufferSize(WCLI_G(chnd),bsize)) RETURN_BOOL(0);
+	RETURN_BOOL(1);
+}
+
+
+
+
 
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/dd317756(v=vs.85).aspx
@@ -480,14 +650,46 @@ PHP_FUNCTION(wcli_get_cursor_position){
 PHP_FUNCTION(wcli_set_cursor_position){
 	COORD pos;
 	SHORT x,y;
+	CONSOLE_SCREEN_BUFFER_INFO info;
 	if(!WCLI_G(console)) RETURN_BOOL(0);
-	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ll", &x,&y) == FAILURE) RETURN_BOOL(0)
-	
-	// TODO: VERIFY WINDOW SIZE
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ll", &x,&y) == FAILURE) RETURN_BOOL(0);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd),&info)) RETURN_BOOL(0);
 	pos.X = x;
 	pos.Y = y;
+	if(pos.X < 0) pos.X = 0;
+	if(pos.Y < 0) pos.Y = 0;
+	if(pos.X >= (info.srWindow.Right - info.srWindow.Left + 1)) pos.X = info.srWindow.Right - info.srWindow.Left;
+	if(pos.Y >= (info.srWindow.Bottom - info.srWindow.Top + 1)) pos.Y = info.srWindow.Bottom - info.srWindow.Top;
 	if(!SetConsoleCursorPosition(WCLI_G(chnd),pos)) RETURN_BOOL(0);
 	RETURN_BOOL(1);
+}
+
+
+PHP_FUNCTION(wcli_move){
+	COORD pos;
+	SHORT x,y;
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l|l", &x,&y) == FAILURE) RETURN_BOOL(0);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd),&info)) RETURN_BOOL(0);
+	pos.X = x + info.dwCursorPosition.X;
+	pos.Y = y + info.dwCursorPosition.Y;
+	if(pos.X < 0) pos.X = 0;
+	if(pos.Y < 0) pos.Y = 0;
+	if(pos.X >= (info.srWindow.Right - info.srWindow.Left + 1)) pos.X = info.srWindow.Right - info.srWindow.Left;
+	if(pos.Y >= (info.srWindow.Bottom - info.srWindow.Top + 1)) pos.Y = info.srWindow.Bottom - info.srWindow.Top;
+	if(!SetConsoleCursorPosition(WCLI_G(chnd),pos)) RETURN_BOOL(0);
+	RETURN_BOOL(1)
+}
+
+
+
+PHP_FUNCTION(wcli_get_font_size){
+	CONSOLE_CURSOR_INFO info;
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	array_init(return_value);
+	add_index_long(return_value, 0, WCLI_G(font).dwFontSize.X);
+	add_index_long(return_value, 1, WCLI_G(font).dwFontSize.Y);
 }
 
 
@@ -510,6 +712,12 @@ PHP_FUNCTION(wcli_get_key) {
 }
 
 
+// add timeout
+PHP_FUNCTION(wcli_get_global_key) {
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	RETURN_LONG(get_global_key());
+}
+
 
 // print output characters with [colors] to the cursor position
 PHP_FUNCTION(wcli_echo) {
@@ -519,15 +727,21 @@ PHP_FUNCTION(wcli_echo) {
 	DWORD size;
 	DWORD bytes;
 
+	//printf("::TEST-02\n");
+	
 	if(!WCLI_G(console)) RETURN_BOOL(0);
 	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd),&info)) RETURN_BOOL(0);
 	
 	fore = info.wAttributes & 0xF;
 	back = info.wAttributes >> 4;
 
+	
+
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|ll", &str,&size,&fore,&back) == FAILURE) RETURN_BOOL(0)
+	if(!SetConsoleTextAttribute(WCLI_G(chnd), (back << 4) | fore)) RETURN_BOOL(0);
 	if(!WriteConsole(WCLI_G(chnd),str,size,&bytes,NULL)) RETURN_BOOL(0);
-	if(!FillConsoleOutputAttribute(WCLI_G(chnd),(back<<4)|fore,size,info.dwCursorPosition,&bytes))  RETURN_BOOL(0);
+	//if(!FillConsoleOutputAttribute(WCLI_G(chnd),(back<<4)|fore,size,info.dwCursorPosition,&bytes))  RETURN_BOOL(0);
+	if(!SetConsoleTextAttribute(WCLI_G(chnd), info.wAttributes)) RETURN_BOOL(0);
 	
 	RETURN_BOOL(1);
 }
@@ -536,8 +750,10 @@ PHP_FUNCTION(wcli_echo) {
 
 // print output characters with [colors] to the specified position
 PHP_FUNCTION(wcli_print) {
+	CONSOLE_SCREEN_BUFFER_INFO info;
 	COORD pos;
-	SHORT x,y;
+	SHORT x = -1;
+	SHORT y = -1;
 	char *str;
 	DWORD size;
 	WORD fore = 0x00;//FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
@@ -545,8 +761,15 @@ PHP_FUNCTION(wcli_print) {
 	DWORD bytes;
 
 	if(!WCLI_G(console)) RETURN_BOOL(0);
-	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "lls|ll", &x,&y,&str,&size,&fore,&back) == FAILURE) RETURN_BOOL(0)
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|llll", &str,&size,&x,&y,&fore,&back) == FAILURE) RETURN_BOOL(0)
 	
+
+	if(x < 0 || y < 0){
+		if(!GetConsoleScreenBufferInfo(WCLI_G(chnd),&info)) RETURN_BOOL(0);
+		if(x < 0) x = info.dwCursorPosition.X;
+		if(y < 0) y = info.dwCursorPosition.Y;
+	}
+
 	pos.X = x;
 	pos.Y = y;
 
@@ -569,6 +792,7 @@ PHP_FUNCTION(wcli_get_mouse_click) {
 	POINT client;
 	SHORT mx,my;
 	SHORT cx,cy;
+	int sx,sy;
 	int i;
 	
 	if(!WCLI_G(console)) RETURN_BOOL(0);
@@ -588,12 +812,17 @@ PHP_FUNCTION(wcli_get_mouse_click) {
 					if(mx > 0 && my > 0){
 						cx = (SHORT)floor((float)mx / WCLI_G(font).dwFontSize.X);
 						cy = (SHORT)floor((float)my / WCLI_G(font).dwFontSize.Y);
+						sx = GetScrollPos(whnd,SB_HORZ);
+						sy = GetScrollPos(whnd,SB_VERT);
+
 						array_init(return_value);
 						add_assoc_long(return_value, "key",i);
 						add_assoc_long(return_value, "px",mx);
 						add_assoc_long(return_value, "py",my);
 						add_assoc_long(return_value, "cx",cx);
 						add_assoc_long(return_value, "cy",cy);
+						add_assoc_long(return_value, "sx",sx);
+						add_assoc_long(return_value, "sy",sy);
 						FlushConsoleInputBuffer(WCLI_G(ihnd));
 						return;
 					}
@@ -661,27 +890,102 @@ PHP_FUNCTION(wcli_clear_line) {
 	DWORD nwc;
 	COORD pos;
 	
-	int x,y;
+	//int x,y;
 	int ls;
 	int ln = 1;
 	if(!WCLI_G(console)) RETURN_BOOL(0);
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l|l", &ls,&ln) == FAILURE) RETURN_BOOL(0);
 	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd),&info)) RETURN_BOOL(0);
 	
-	
 	pos.X = 0;
 	pos.Y = ls;
 
-
-	
 	if(!FillConsoleOutputAttribute(WCLI_G(chnd),info.wAttributes,info.dwSize.X*ln,pos,&nwc))  RETURN_BOOL(0);
 	if(!FillConsoleOutputCharacter(WCLI_G(chnd),32,info.dwSize.X*ln,pos,&nwc)) RETURN_BOOL(0);
-	
-	
-
-
+	RETURN_BOOL(1);
 }
 
+PHP_FUNCTION(wcli_get_block) {
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	COORD size,pos;
+	PCHAR_INFO buf;
+	SMALL_RECT region;
+	unsigned char *cline;
+	unsigned int bufsize;
+	int x,y,w,h;
+	int i,j;
+	
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd),&info)) RETURN_BOOL(0);
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "llll", &x,&y,&w,&h) == FAILURE) RETURN_BOOL(0);
+	if(x < 0 || y < 0 || w < 1 || h < 1) RETURN_BOOL(0);
+	if((x+w) > info.dwSize.X || (y+h) > info.dwSize.Y) RETURN_BOOL(0);
+
+	pos.X = 0;
+	pos.Y = 0;
+	size.X = w;
+	size.Y = h;
+	region.Left = x;
+	region.Right = x+w;
+	region.Top = y;
+	region.Bottom = y+h;
+
+	bufsize = sizeof(CHAR_INFO) * w * h;
+	buf = (CHAR_INFO **)malloc(bufsize);
+
+	if(!ReadConsoleOutput(WCLI_G(chnd),buf,size,pos,&region)) {
+		free(buf);
+		RETURN_BOOL(0);
+	}
+
+	cline = (unsigned char *)malloc(w+1);
+	array_init(return_value);
+	for(i = 0; i < h; i++){
+		for(j = 0; j < w; j++) cline[j] = buf[(i*w)+j].Char.AsciiChar;
+		cline[j] = 0;
+		add_next_index_string(return_value, cline, 1);
+	}
+	free(cline);
+	free(buf);
+}
+
+
+PHP_FUNCTION(wcli_get_line) {
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	COORD size,pos;
+	PCHAR_INFO buf;
+	SMALL_RECT region;
+	unsigned char *cline;
+	int y,i,j;
+	
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd),&info)) RETURN_BOOL(0);
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &y) == FAILURE) RETURN_BOOL(0);
+	if(y < 0 || y >= info.dwSize.Y) RETURN_BOOL(0);
+		
+	pos.X = 0;
+	pos.Y = 0;
+	size.X = info.dwSize.X;
+	size.Y = 1;
+	region.Left = 0;
+	region.Right = info.dwSize.X-1;
+	region.Top = y;
+	region.Bottom = y;
+	
+	buf = (CHAR_INFO **)malloc(sizeof(CHAR_INFO) * info.dwSize.X);
+	if(!ReadConsoleOutput(WCLI_G(chnd),buf,size,pos,&region)) {
+		free(buf);
+		RETURN_BOOL(0);
+	}
+
+	cline = (unsigned char *)malloc(info.dwSize.X+1);
+	for(i = 0; i < info.dwSize.X; i++) cline[i] = buf[i].Char.AsciiChar;
+	cline[i] = 0;
+
+	RETURN_STRING(cline,1);
+	free(cline);
+	free(buf);
+}
 
 
 // ********************************************************************
@@ -704,11 +1008,77 @@ PHP_FUNCTION(wcli_is_cmd_call) {
 }
 
 
-PHP_FUNCTION(wcli_test) {
-
-	printf("KEY: %u\n",get_key());
+// https://msdn.microsoft.com/en-ca/library/windows/desktop/ms724385(v=vs.85).aspx
+PHP_FUNCTION(wcli_system_metric) {
+	int idx,val;
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &idx) == FAILURE) RETURN_BOOL(0);
+	val = GetSystemMetrics(idx);
+	RETURN_LONG((long)val);
 }
 
+
+PHP_FUNCTION(wcli_test) {
+
+}
+
+
+
+
+
+
+PHP_FUNCTION(wcli_set_wnd_ontop) {
+	BOOL ontop = TRUE;
+	LONG win;
+	RECT rect;
+	DWORD err;
+	HWND whnd;
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l|b", &win, &ontop) == FAILURE) RETURN_BOOL(0);
+
+	//printf("WHND: %u\n",whnd);
+	
+	whnd = FindWindow("wbNakedWnd","VLC Bookmark");
+
+	//printf("WIN: %u\n",whnd);
+	ShowWindow(whnd,SW_RESTORE);
+
+
+	
+	if(!GetWindowRect((void *)whnd,&rect)) {
+		err = GetLastError();
+		printf("ERROR: %u\n",err);
+		RETURN_BOOL(0);
+	}
+	if(!SetWindowPos(whnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_SHOWWINDOW)) {
+		err = GetLastError();
+		printf("ERROR: %u\n",err);
+		RETURN_BOOL(0);
+	}
+	
+
+
+
+
+	RETURN_BOOL(1);
+
+	/*
+	
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	whnd = get_console_window_handle();
+	if(!whnd) RETURN_BOOL(0);
+	if(!IsWindowVisible(whnd)) RETURN_BOOL(0);
+	if(!ShowWindow(whnd,SW_RESTORE)) RETURN_BOOL(0);
+	RETURN_BOOL(1);
+	*/
+}
+
+PHP_FUNCTION(wcli_get_foreground_wnd_title) {
+	HWND whnd;
+	char * title[4092];
+	if(!(whnd = GetForegroundWindow())) RETURN_BOOL(0);
+	if(!GetWindowText(whnd,title,4092)) RETURN_BOOL(0);
+	RETURN_STRING(title,1);
+}
 
 
 
@@ -1125,6 +1495,24 @@ unsigned char get_key(){
 					FlushConsoleInputBuffer(WCLI_G(ihnd));
 					return i;
 				}
+			}
+		}
+		Sleep(1);
+	}
+}
+
+
+// Get Keyboard Key
+unsigned char get_global_key(){
+	unsigned int i;
+
+	TSRMLS_FETCH();
+
+	for(flush_input_buffer();;){
+		for(i=8; i <= 256; i++){
+			if(GetAsyncKeyState(i) & 0x7FFF){
+				FlushConsoleInputBuffer(WCLI_G(ihnd));
+				return i;
 			}
 		}
 		Sleep(1);
