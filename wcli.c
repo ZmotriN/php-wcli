@@ -283,6 +283,7 @@ const zend_function_entry wcli_functions[] = {
 	PHP_FE(wcli_print, NULL)
 	PHP_FE(wcli_get_key, NULL)
 	PHP_FE(wcli_get_global_key, NULL)
+	PHP_FE(wcli_get_global_key_async, NULL)
 	PHP_FE(wcli_get_mouse_click, NULL)
 	PHP_FE(wcli_flush_input_buffer, NULL)
 	PHP_FALIAS(wcli_getch, wcli_get_key, NULL)
@@ -658,8 +659,9 @@ PHP_FUNCTION(wcli_set_cursor_position){
 	pos.Y = y;
 	if(pos.X < 0) pos.X = 0;
 	if(pos.Y < 0) pos.Y = 0;
-	if(pos.X >= (info.srWindow.Right - info.srWindow.Left + 1)) pos.X = info.srWindow.Right - info.srWindow.Left;
-	if(pos.Y >= (info.srWindow.Bottom - info.srWindow.Top + 1)) pos.Y = info.srWindow.Bottom - info.srWindow.Top;
+	//if(pos.X >= (info.srWindow.Right - info.srWindow.Left + 1)) pos.X = info.srWindow.Right - info.srWindow.Left;
+	//if(pos.Y >= (info.srWindow.Bottom - info.srWindow.Top + 1)) pos.Y = info.srWindow.Bottom - info.srWindow.Top;
+	//printf("patate\n");
 	if(!SetConsoleCursorPosition(WCLI_G(chnd),pos)) RETURN_BOOL(0);
 	RETURN_BOOL(1);
 }
@@ -714,10 +716,15 @@ PHP_FUNCTION(wcli_get_key) {
 
 // add timeout
 PHP_FUNCTION(wcli_get_global_key) {
-	if(!WCLI_G(console)) RETURN_BOOL(0);
+	//if(!WCLI_G(console)) RETURN_BOOL(0);
 	RETURN_LONG(get_global_key());
 }
 
+
+PHP_FUNCTION(wcli_get_global_key_async) {
+	//if(!WCLI_G(console)) RETURN_BOOL(0);
+	RETURN_LONG(get_global_key_async());
+}
 
 // print output characters with [colors] to the cursor position
 PHP_FUNCTION(wcli_echo) {
@@ -1517,6 +1524,22 @@ unsigned char get_global_key(){
 		}
 		Sleep(1);
 	}
+}
+
+
+// Get Keyboard Key Async
+unsigned char get_global_key_async(){
+	unsigned int i;
+
+	TSRMLS_FETCH();
+
+	for(i=8; i <= 256; i++){
+		if(GetAsyncKeyState(i) & 0x7FFF){
+			FlushConsoleInputBuffer(WCLI_G(ihnd));
+			return i;
+		}
+	}
+	return 0;
 }
 
 
