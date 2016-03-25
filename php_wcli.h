@@ -69,6 +69,10 @@ HWND  get_console_window_handle();
 BOOL  is_cmd_call();
 unsigned char get_key();
 unsigned char get_global_key();
+unsigned char get_global_key_async();
+unsigned char get_input();
+unsigned char get_input_async();
+
 BOOL  UTF8ToUnicode16(CHAR *in_Src, WCHAR *out_Dst, INT in_MaxLen);
 BOOL activate_window(HWND whnd);
 
@@ -91,6 +95,8 @@ PHP_FUNCTION(wcli_set_buffer_size);
 
 PHP_FUNCTION(wcli_clear);
 PHP_FUNCTION(wcli_clear_line);
+PHP_FUNCTION(wcli_clear_rect);
+PHP_FUNCTION(wcli_fill);
 PHP_FUNCTION(wcli_get_block);
 PHP_FUNCTION(wcli_get_line);
 
@@ -122,7 +128,11 @@ PHP_FUNCTION(wcli_echo);
 PHP_FUNCTION(wcli_print);
 PHP_FUNCTION(wcli_get_key);
 PHP_FUNCTION(wcli_get_global_key);
+PHP_FUNCTION(wcli_get_global_key_async);
 PHP_FUNCTION(wcli_get_mouse_click);
+PHP_FUNCTION(wcli_get_input);
+PHP_FUNCTION(wcli_get_input_async);
+
 PHP_FUNCTION(wcli_flush_input_buffer);
 
 PHP_FUNCTION(wcli_get_parent_pid);
@@ -136,6 +146,8 @@ PHP_FUNCTION(wcli_minimize);
 PHP_FUNCTION(wcli_maximize);
 PHP_FUNCTION(wcli_restore);
 PHP_FUNCTION(wcli_activate);
+PHP_FUNCTION(wcli_flash);
+PHP_FUNCTION(wcli_bring_to_top);
 PHP_FUNCTION(wcli_set_position);
 
 PHP_FUNCTION(wcli_get_clipboard);

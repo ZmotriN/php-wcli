@@ -235,6 +235,8 @@ const zend_function_entry wcli_functions[] = {
 
 	PHP_FE(wcli_clear, NULL)
 	PHP_FE(wcli_clear_line, NULL)
+	PHP_FE(wcli_clear_rect, NULL)
+	PHP_FE(wcli_fill, NULL)
 	PHP_FE(wcli_get_block, NULL)
 	PHP_FE(wcli_get_line, NULL)
 	
@@ -284,6 +286,10 @@ const zend_function_entry wcli_functions[] = {
 	PHP_FE(wcli_get_key, NULL)
 	PHP_FE(wcli_get_global_key, NULL)
 	PHP_FE(wcli_get_global_key_async, NULL)
+
+	PHP_FE(wcli_get_input, NULL)
+	PHP_FE(wcli_get_input_async, NULL)
+
 	PHP_FE(wcli_get_mouse_click, NULL)
 	PHP_FE(wcli_flush_input_buffer, NULL)
 	PHP_FALIAS(wcli_getch, wcli_get_key, NULL)
@@ -302,6 +308,10 @@ const zend_function_entry wcli_functions[] = {
 	PHP_FE(wcli_maximize, NULL)
 	PHP_FE(wcli_restore, NULL)
 	PHP_FE(wcli_activate, NULL)
+	PHP_FE(wcli_flash, NULL)
+	PHP_FE(wcli_bring_to_top, NULL)
+	PHP_FALIAS(wcli_bring_to_front, wcli_bring_to_top, NULL)
+	
 	PHP_FE(wcli_set_position, NULL)
 
 	PHP_FE(wcli_get_clipboard, NULL)
@@ -385,12 +395,29 @@ PHP_FUNCTION(wcli_restore_init) {
 
 
 PHP_FUNCTION(wcli_get_console_size) {
+	BOOL full = FALSE;
+	HWND whnd;
+	int sx,sy;
 	CONSOLE_SCREEN_BUFFER_INFO info;
 	if(!WCLI_G(console)) RETURN_BOOL(0);
 	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd),&info)) RETURN_BOOL(0);
+	
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|b", &full) == FAILURE) RETURN_BOOL(0);
+	
 	array_init(return_value);
-	add_index_long(return_value, 0, info.srWindow.Right - info.srWindow.Left + 1);
-	add_index_long(return_value, 1, info.srWindow.Bottom - info.srWindow.Top + 1);
+	if(full){
+		whnd = get_console_window_handle();
+		sx = GetScrollPos(whnd,SB_HORZ);
+		sy = GetScrollPos(whnd,SB_VERT);
+		add_assoc_long(return_value, "w",info.srWindow.Right - info.srWindow.Left + 1);
+		add_assoc_long(return_value, "h",info.srWindow.Bottom - info.srWindow.Top + 1);
+		add_assoc_long(return_value, "x",sx);
+		add_assoc_long(return_value, "y",sy);
+	}else{
+		add_index_long(return_value, 0, info.srWindow.Right - info.srWindow.Left + 1);
+		add_index_long(return_value, 1, info.srWindow.Bottom - info.srWindow.Top + 1);
+	}
+
 }
 
 
@@ -715,6 +742,19 @@ PHP_FUNCTION(wcli_get_key) {
 
 
 // add timeout
+PHP_FUNCTION(wcli_get_input) {
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	RETURN_LONG(get_input());
+}
+
+// add timeout
+PHP_FUNCTION(wcli_get_input_async) {
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	RETURN_LONG(get_input_async());
+}
+
+
+// add timeout
 PHP_FUNCTION(wcli_get_global_key) {
 	//if(!WCLI_G(console)) RETURN_BOOL(0);
 	RETURN_LONG(get_global_key());
@@ -876,17 +916,11 @@ PHP_FUNCTION(wcli_clear) {
 	pos.X = 0;
 	pos.Y = 0;
 
-
-	// à revoir, pas sur pour les set cursor position
-
-
 	if(!WCLI_G(console)) RETURN_BOOL(0);
 	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd),&info)) RETURN_BOOL(0);
-	if(!SetConsoleCursorPosition(WCLI_G(chnd),pos)) RETURN_BOOL(0);
 	if(!FillConsoleOutputAttribute(WCLI_G(chnd),info.wAttributes,info.dwSize.X*info.dwSize.Y,pos,&nwc))  RETURN_BOOL(0);
 	if(!FillConsoleOutputCharacter(WCLI_G(chnd),32,info.dwSize.X*info.dwSize.Y,pos,&nwc)) RETURN_BOOL(0);
 	if(!SetConsoleCursorPosition(WCLI_G(chnd),pos)) RETURN_BOOL(0);
-	if(!SetConsoleTextAttribute(WCLI_G(chnd), info.wAttributes)) RETURN_BOOL(0); // pas sur de celle là
 	RETURN_BOOL(1);
 }
 
@@ -911,6 +945,59 @@ PHP_FUNCTION(wcli_clear_line) {
 	if(!FillConsoleOutputCharacter(WCLI_G(chnd),32,info.dwSize.X*ln,pos,&nwc)) RETURN_BOOL(0);
 	RETURN_BOOL(1);
 }
+
+
+PHP_FUNCTION(wcli_clear_rect) {
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	DWORD nwc;
+	COORD pos;
+	SHORT x,y,w,h,i;
+	
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "llll", &x, &y, &w, &h) == FAILURE) RETURN_BOOL(0);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd),&info)) RETURN_BOOL(0);
+	if(x < 0 || y < 0 || w < 0 || h < 0) RETURN_BOOL(0);
+	if((x+w) > info.dwSize.X) w = info.dwSize.X - x;
+	pos.X = x;
+	for(i=0; i<h && (i+y < info.dwSize.Y); i++){
+		pos.Y = y + i;
+		if(!FillConsoleOutputAttribute(WCLI_G(chnd),info.wAttributes,w,pos,&nwc))  RETURN_BOOL(0);
+		if(!FillConsoleOutputCharacter(WCLI_G(chnd),32,w,pos,&nwc)) RETURN_BOOL(0);
+	}
+	RETURN_BOOL(1);
+}
+
+
+PHP_FUNCTION(wcli_fill) {
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	DWORD nwc;
+	COORD pos;
+	SHORT c,x,y,w,h,i;
+	WORD fore,back,color;
+
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd),&info)) RETURN_BOOL(0);
+	fore = info.wAttributes & 0xF;
+	back = info.wAttributes >> 4;
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "lllll|ll", &x,&y,&w,&h,&c,&fore,&back) == FAILURE) RETURN_BOOL(0)
+
+	if(c < 32 || c > 255) c = 35;
+	if(x < 0 || y < 0 || w < 0 || h < 0) RETURN_BOOL(0);
+	if((x+w) > info.dwSize.X) w = info.dwSize.X - x;
+
+	pos.X = x;
+	color = (back<<4)|fore;
+
+	for(i=0; i<h && (i+y < info.dwSize.Y); i++){
+		pos.Y = y + i;
+		if(!FillConsoleOutputAttribute(WCLI_G(chnd),color,w,pos,&nwc))  RETURN_BOOL(0);
+		if(!FillConsoleOutputCharacter(WCLI_G(chnd),c,w,pos,&nwc)) RETURN_BOOL(0);
+	}
+	RETURN_BOOL(1);
+}
+
+
 
 PHP_FUNCTION(wcli_get_block) {
 	CONSOLE_SCREEN_BUFFER_INFO info;
@@ -1201,9 +1288,36 @@ PHP_FUNCTION(wcli_activate) {
 	if(!WCLI_G(console)) RETURN_BOOL(0);
 	whnd = get_console_window_handle();
 	if(!whnd) RETURN_BOOL(0);
-	if(!activate_window(whnd)) RETURN_BOOL(0);
-	RETURN_BOOL(1);
+	RETURN_BOOL(activate_window(whnd));
 }
+
+
+PHP_FUNCTION(wcli_flash) {
+	BOOL invert = FALSE;
+	HWND whnd;
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	whnd = get_console_window_handle();
+	if(!whnd) RETURN_BOOL(0);
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|b", &invert) == FAILURE) RETURN_BOOL(0);
+	RETURN_BOOL(FlashWindow(whnd,invert));
+}
+
+
+
+PHP_FUNCTION(wcli_bring_to_top) {
+	HWND whnd;
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	whnd = get_console_window_handle();
+	if(!whnd) RETURN_BOOL(0);
+	if(!IsWindowVisible(whnd)) RETURN_BOOL(0);
+	
+	if(IsIconic(whnd) && !ShowWindow(whnd,SW_RESTORE)) RETURN_BOOL(0);
+	if(!SetWindowPos(whnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_SHOWWINDOW)) RETURN_BOOL(0);
+	if(!SetWindowPos(whnd,HWND_NOTOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_SHOWWINDOW)) RETURN_BOOL(0);
+	RETURN_BOOL(BringWindowToTop(whnd));
+}
+
+
 
 
 PHP_FUNCTION(wcli_set_position) {
@@ -1228,10 +1342,12 @@ PHP_FUNCTION(wcli_set_position) {
 // *********************** CLIPBOARD FUNCTIONS ************************
 // ********************************************************************
 
-
+/*
 PHP_FUNCTION(wcli_get_clipboard) {
 	HANDLE hdata;
 	char *pszText;
+	CString
+
 
 	BOOL success = FALSE;
 
@@ -1244,13 +1360,50 @@ PHP_FUNCTION(wcli_get_clipboard) {
 			if(pszText == NULL){
 				RETURN_NULL();
 			}else{
-				RETURN_STRING(pszText,1);
+				RETURN_STRING(pszText,TRUE);
 			}
 		}
 	}
 	if(!success) RETURN_NULL();
 }
+*/
 
+
+PHP_FUNCTION(wcli_get_clipboard) {
+	char tcopy[4096];
+	//char *wText;
+	char *wGlobal;
+	HANDLE hdata;
+	SIZE_T blen;
+
+	BOOL success = FALSE;
+	
+	//printf("BREAK 1\n");
+	if(OpenClipboard(NULL)){
+		//printf("BREAK 2\n");
+		hdata = GetClipboardData(CF_TEXT);
+		//printf("BREAK 3\n");
+		if(hdata){
+			//printf("BREAK 4\n");
+			wGlobal = (wchar_t*)GlobalLock(hdata);
+			//printf("BREAK 5\n");
+			if(wGlobal != NULL){
+				//printf("BREAK 6\n");
+				blen = GlobalSize(hdata);
+				//printf("SIZE: %d\n",blen);
+				if(blen > 4095) blen = 4095;
+				memcpy(tcopy,wGlobal,blen);
+				GlobalUnlock(hdata);
+				tcopy[blen] = 0;
+				success = TRUE;
+			}
+		}
+		/*GlobalUnlock(hdata);*/
+	}
+	CloseClipboard();
+	if(!success) RETURN_NULL();
+	RETURN_STRING(tcopy,TRUE);
+}
 
 
 PHP_FUNCTION(wcli_set_clipboard) {
@@ -1263,30 +1416,59 @@ PHP_FUNCTION(wcli_set_clipboard) {
 	HGLOBAL hwdata;
 	LPTSTR clipcopy;
 	LPTSTR wclipcopy;
-
+	
+	//printf("BREAK 1\n");
 	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &clip, &size) == FAILURE) RETURN_BOOL(0);
 	
+	//printf("BREAK 2\n");
 	if(OpenClipboard(NULL)){
+		//printf("BREAK 3\n");
 		hdata = GlobalAlloc(GMEM_MOVEABLE, size+1); 
+		//printf("BREAK 5\n");
 		clipcopy = (LPTSTR)GlobalLock(hdata); 
+		//printf("BREAK 5\n");
 		memcpy(clipcopy, clip, size); 
-		GlobalUnlock(hdata);
+		
+		//printf("BREAK 6\n");
 		if(SetClipboardData(CF_TEXT,hdata)){
+			GlobalUnlock(hdata);
+			GlobalFree(hdata);
+			//printf("BREAK 7\n");
 			size = size * 2;
 			wclip = (WCHAR *)emalloc(size+1);
+			//printf("BREAK 8\n");
 			if(!UTF8ToUnicode16(clip,wclip,size+2)) printf("Conversion failed\n");
+			//printf("BREAK 9\n");
 			hwdata = GlobalAlloc(GMEM_MOVEABLE, size+2); 
+			//printf("BREAK 10\n");
 			wclipcopy = (LPTSTR)GlobalLock(hwdata); 
+	
+			//printf("BREAK 11\n");
 			memcpy(wclipcopy, wclip, size); 
-			GlobalUnlock(hwdata);
+			
+			//printf("BREAK 12\n");
+	
+			//printf("BREAK 13\n");
 			SetClipboardData(CF_UNICODETEXT,hwdata);
+			//printf("BREAK 14\n");
+			GlobalUnlock(hwdata);
 			GlobalFree(hwdata);
+			//printf("BREAK 15\n");
 			efree(wclip);
+			//printf("BREAK 16\n");
 			success = TRUE;
+		}else{
+			GlobalUnlock(hdata);
+			GlobalFree(hdata);
 		}
-		GlobalFree(hdata);
-		CloseClipboard();
+		//printf("BREAK 17\n");
+		
+		//printf("BREAK 18\n");
+		
 	}
+	//printf("BREAK 19\n");
+	CloseClipboard();
+	//printf("BREAK 20\n");
 	RETURN_BOOL(success);
 }
 
@@ -1491,13 +1673,40 @@ unsigned char get_key(){
 	TSRMLS_FETCH();
 	whnd = get_console_window_handle();
 	if(!whnd) {
-		printf("Can't get whnd.\n");
+		//printf("Can't get whnd.\n");
 		return 0;
 	}
 
 	for(flush_input_buffer();;){
 		if(whnd == GetForegroundWindow()){
 			for(i=8; i <= 256; i++){
+				if(GetAsyncKeyState(i) & 0x7FFF){
+					FlushConsoleInputBuffer(WCLI_G(ihnd));
+					return i;
+				}
+			}
+		}
+		Sleep(1);
+	}
+}
+
+
+
+// Get Input
+unsigned char get_input(){
+	unsigned int i;
+	HWND whnd;
+
+	TSRMLS_FETCH();
+	whnd = get_console_window_handle();
+	if(!whnd) {
+		//printf("Can't get whnd.\n");
+		return 0;
+	}
+
+	for(flush_input_buffer();;){
+		if(whnd == GetForegroundWindow()){
+			for(i=1; i <= 256; i++){
 				if(GetAsyncKeyState(i) & 0x7FFF){
 					FlushConsoleInputBuffer(WCLI_G(ihnd));
 					return i;
@@ -1539,6 +1748,26 @@ unsigned char get_global_key_async(){
 			return i;
 		}
 	}
+	return 0;
+}
+
+// Get Input Async
+unsigned char get_input_async(){
+	unsigned int i;
+	HWND whnd;
+
+	TSRMLS_FETCH();
+	whnd = get_console_window_handle();
+	if(whnd != GetForegroundWindow()) return 0;
+
+	if(GetAsyncKeyState(VK_LBUTTON) & 0x8000) return VK_LBUTTON;
+	for(i=1; i <= 256; i++){
+		if(GetAsyncKeyState(i) & 0x7FFF){
+			FlushConsoleInputBuffer(WCLI_G(ihnd));
+			return i;
+		}
+	}
+
 	return 0;
 }
 
