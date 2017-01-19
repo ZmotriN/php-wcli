@@ -284,6 +284,8 @@ const zend_function_entry wcli_functions[] = {
 	PHP_FE(wcli_echo, NULL)
 	PHP_FE(wcli_print, NULL)
 	PHP_FE(wcli_get_key, NULL)
+	PHP_FE(wcli_get_key_state, NULL)
+	
 	PHP_FE(wcli_get_global_key, NULL)
 	PHP_FE(wcli_get_global_key_async, NULL)
 
@@ -291,11 +293,13 @@ const zend_function_entry wcli_functions[] = {
 	PHP_FE(wcli_get_input_async, NULL)
 
 	PHP_FE(wcli_get_mouse_click, NULL)
+	PHP_FE(wcli_get_mouse_click_async, NULL)
 	PHP_FE(wcli_flush_input_buffer, NULL)
 	PHP_FALIAS(wcli_getch, wcli_get_key, NULL)
 	PHP_FALIAS(getch, wcli_get_key, NULL)
 
 
+	PHP_FE(wcli_get_exepath, NULL)
 	PHP_FE(wcli_get_parent_pid, NULL)
 	PHP_FE(wcli_is_cmd_call, NULL)
 
@@ -450,9 +454,11 @@ PHP_FUNCTION(wcli_set_console_size) {
 	size.Bottom = h-1;
 	if(!SetConsoleWindowInfo(WCLI_G(chnd),TRUE,&size)) RETURN_BOOL(0);
 
+	
 	bsize.X = w;
 	bsize.Y = bh;
 	if(!SetConsoleScreenBufferSize(WCLI_G(chnd),bsize)) RETURN_BOOL(0);
+	
 	RETURN_BOOL(1);
 }
 
@@ -734,6 +740,16 @@ PHP_FUNCTION(wcli_flush_input_buffer) {
 }
 
 
+
+PHP_FUNCTION(wcli_get_key_state) {
+	SHORT state, key;
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &key) == FAILURE) RETURN_BOOL(0);
+	//state = GetKeyState(key);
+	state = GetAsyncKeyState(key);
+	RETURN_LONG(state & 0xFF);
+}
+
+
 // add timeout
 PHP_FUNCTION(wcli_get_key) {
 	if(!WCLI_G(console)) RETURN_BOOL(0);
@@ -847,6 +863,7 @@ PHP_FUNCTION(wcli_get_mouse_click) {
 
 	if(!whnd) RETURN_BOOL(0);
 	for(flush_input_buffer();;){
+	//for(;;flush_input_buffer()){
 		if(whnd == GetForegroundWindow()){
 			for(i=1; i <= 6; i++){
 				if(i != 3 && GetAsyncKeyState(i) & 0x7FFF){
@@ -879,6 +896,51 @@ PHP_FUNCTION(wcli_get_mouse_click) {
 		FlushConsoleInputBuffer(WCLI_G(ihnd));
 		Sleep(1);
 	}
+}
+
+PHP_FUNCTION(wcli_get_mouse_click_async) {
+	HWND whnd;
+	POINT mouse;
+	POINT client;
+	SHORT mx,my;
+	SHORT cx,cy;
+	int sx,sy;
+	int i;
+	
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	whnd = get_console_window_handle();
+
+	if(!whnd) RETURN_BOOL(0);
+	if(whnd == GetForegroundWindow()){
+		for(i=1; i <= 6; i++){
+			if(i != 3 && GetAsyncKeyState(i) & 0x7FFF){
+				client.x = 0;
+				client.y = 0;
+				GetCursorPos(&mouse);
+				ClientToScreen(whnd,&client);
+				mx = ((SHORT)mouse.x) - ((SHORT)client.x);
+				my = (SHORT)(mouse.y - client.y);
+				if(mx > 0 && my > 0){
+					cx = (SHORT)floor((float)mx / WCLI_G(font).dwFontSize.X);
+					cy = (SHORT)floor((float)my / WCLI_G(font).dwFontSize.Y);
+					sx = GetScrollPos(whnd,SB_HORZ);
+					sy = GetScrollPos(whnd,SB_VERT);
+
+					array_init(return_value);
+					add_assoc_long(return_value, "key",i);
+					add_assoc_long(return_value, "px",mx);
+					add_assoc_long(return_value, "py",my);
+					add_assoc_long(return_value, "cx",cx);
+					add_assoc_long(return_value, "cy",cy);
+					add_assoc_long(return_value, "sx",sx);
+					add_assoc_long(return_value, "sy",sy);
+					FlushConsoleInputBuffer(WCLI_G(ihnd));
+					return;
+				}
+			}
+		}
+	}
+	RETURN_NULL();
 }
 
 
@@ -998,7 +1060,7 @@ PHP_FUNCTION(wcli_fill) {
 }
 
 
-
+// #196 max ??? wtf...
 PHP_FUNCTION(wcli_get_block) {
 	CONSOLE_SCREEN_BUFFER_INFO info;
 	COORD size,pos;
@@ -1072,19 +1134,33 @@ PHP_FUNCTION(wcli_get_line) {
 		RETURN_BOOL(0);
 	}
 
-	cline = (unsigned char *)malloc(info.dwSize.X+1);
+	cline = (unsigned char *)emalloc(info.dwSize.X+1);
 	for(i = 0; i < info.dwSize.X; i++) cline[i] = buf[i].Char.AsciiChar;
 	cline[i] = 0;
 
-	RETURN_STRING(cline,1);
-	free(cline);
 	free(buf);
+	RETURN_STRING(cline,1);
+	//free(cline);
+	
 }
 
 
 // ********************************************************************
 // ************************ PROCESS FUNCTIONS *************************
 // ********************************************************************
+
+
+PHP_FUNCTION(wcli_get_exepath) {
+	unsigned char path[4096];
+	unsigned char *rpath;
+	DWORD pathsize;
+	pathsize = GetModuleFileName(NULL,path,4096);
+	rpath = emalloc(pathsize+1);
+	memcpy(rpath,path,pathsize);
+	rpath[pathsize] = 0;
+	RETURN_STRING(rpath,1);
+}
+
 
 
 PHP_FUNCTION(wcli_get_parent_pid) {
@@ -1112,6 +1188,58 @@ PHP_FUNCTION(wcli_system_metric) {
 
 
 PHP_FUNCTION(wcli_test) {
+	HRSRC hr;
+	HMODULE lib;
+	unsigned char path[2048];
+	DWORD pathsize;
+	HGLOBAL hData;
+	
+	HINSTANCE hInst;
+	DWORD dataSize;
+	unsigned char *cdata;
+	unsigned char *data;
+
+
+	pathsize = GetModuleFileName(NULL,path,2048);
+	printf("PATHSIZE: %u\n",pathsize);
+	printf("PATH: %s\n",path);
+
+	lib = LoadLibrary(path);
+	printf("LIB: %u\n",lib);
+
+	hr = FindResource(lib,"RUN","PHP");
+	printf("RES: %u\n",hr);
+
+
+	hInst = GetModuleHandle(NULL);
+    hData = LoadResource(hInst, hr);
+    if (hData)
+    {
+        dataSize = SizeofResource(hInst, hr);
+        cdata = (char*)LockResource(hData);
+	
+		printf("dataSize: %u\n",dataSize);
+
+		data = (unsigned char *)emalloc(dataSize+1);
+		memcpy(data, cdata, dataSize); 
+	
+	
+		data[dataSize] = 0;
+		printf("%s\n",data);
+		efree(data);
+	
+	}
+
+
+
+
+	return;
+
+	//printf("ERROR: %u\n",GetLastError());
+
+
+
+
 
 }
 

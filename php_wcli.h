@@ -127,14 +127,17 @@ PHP_FUNCTION(wcli_move);
 PHP_FUNCTION(wcli_echo);
 PHP_FUNCTION(wcli_print);
 PHP_FUNCTION(wcli_get_key);
+PHP_FUNCTION(wcli_get_key_state);
 PHP_FUNCTION(wcli_get_global_key);
 PHP_FUNCTION(wcli_get_global_key_async);
 PHP_FUNCTION(wcli_get_mouse_click);
+PHP_FUNCTION(wcli_get_mouse_click_async);
 PHP_FUNCTION(wcli_get_input);
 PHP_FUNCTION(wcli_get_input_async);
 
 PHP_FUNCTION(wcli_flush_input_buffer);
 
+PHP_FUNCTION(wcli_get_exepath);
 PHP_FUNCTION(wcli_get_parent_pid);
 PHP_FUNCTION(wcli_is_cmd_call);
 
