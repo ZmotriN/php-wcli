@@ -1,8 +1,7 @@
-// $ Id: $
-// vim:ft=javascript
+ARG_WITH('wcli', 'wcli support', 'no');
 
-ARG_ENABLE('wcli' , 'Add support for WCLI Win32 console enhancer', 'no');
-if (PHP_WCLI != "no") {
-  EXTENSION("wcli", "wcli.c");
-  AC_DEFINE("HAVE_WCLI", 1, "wcli support");
+if (PHP_WCLI != 'no') {
+	AC_DEFINE('HAVE_WCLI', 1, 'wcli support enabled');
+
+	EXTENSION('wcli', 'wcli.c', PHP_WCLI_SHARED, '/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1');
 }
