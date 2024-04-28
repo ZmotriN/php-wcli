@@ -217,3 +217,19 @@ function wcli_reset_colors(): bool {}
  * @return bool True if success, else false.
  */
 function wcli_hide_cursor(): bool {}
+
+
+/**
+ * Show console cursor.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_show_cursor(): bool {}
+
+
+/**
+ * Retrieve cursor visibility.
+ *
+ * @return bool True if visible, else false.
+ */
+function wcli_get_cursor_visibility(): bool {}
