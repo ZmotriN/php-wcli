@@ -233,3 +233,13 @@ function wcli_show_cursor(): bool {}
  * @return bool True if visible, else false.
  */
 function wcli_get_cursor_visibility(): bool {}
+
+
+/**
+ * Set cursor visibility
+ *
+ * @param bool $visible True to show, false to hide.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_set_cursor_visibility(bool $visible): bool {}

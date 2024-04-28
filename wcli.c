@@ -448,6 +448,23 @@ ZEND_FUNCTION(wcli_get_cursor_visibility)
 }
 
 
+ZEND_FUNCTION(wcli_set_cursor_visibility)
+{
+	CONSOLE_CURSOR_INFO info;
+	zend_bool visible;
+
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_BOOL(visible)
+	ZEND_PARSE_PARAMETERS_END();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleCursorInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	
+	info.bVisible = (BOOL)visible;
+	if(!SetConsoleCursorInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	
+	RETURN_BOOL(TRUE);
+}
 
 
 
