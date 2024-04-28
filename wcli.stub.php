@@ -22,3 +22,13 @@ function wcli_get_input_handle(): int|bool {}
  * @return int|bool Window handle
  */
 function wcli_get_window_handle(): int|bool {}
+
+
+
+/**
+ * Retrieve the size and the scrolling of the console.
+ * Return an array [w, h, x, y]
+ *
+ * @return array|bool
+ */
+function wcli_get_console_size(): array|bool {}

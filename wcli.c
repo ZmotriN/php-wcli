@@ -122,6 +122,32 @@ ZEND_FUNCTION(wcli_get_window_handle) {
 
 
 
+// ********************************************************************
+// ************************* CONSOLE FUNCTIONS ************************
+// ********************************************************************
+
+
+ZEND_FUNCTION(wcli_get_console_size)
+{
+	HWND whnd;
+	int sx,sy;
+	CONSOLE_SCREEN_BUFFER_INFO info;
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	
+	ZEND_PARSE_PARAMETERS_NONE();
+	
+	array_init(return_value);
+	whnd = get_console_window_handle();
+	sx = GetScrollPos(whnd, SB_HORZ);
+	sy = GetScrollPos(whnd, SB_VERT);
+	add_assoc_long(return_value, "w", info.srWindow.Right - info.srWindow.Left + 1);
+	add_assoc_long(return_value, "h", info.srWindow.Bottom - info.srWindow.Top + 1);
+	add_assoc_long(return_value, "x", sx);
+	add_assoc_long(return_value, "y", sy);
+
+}
 
 
 
