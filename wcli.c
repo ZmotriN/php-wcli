@@ -242,6 +242,25 @@ ZEND_FUNCTION(wcli_set_buffer_size)
 }
 
 
+ZEND_FUNCTION(wcli_get_code_page)
+{
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	RETURN_LONG(GetConsoleCP());
+}
+
+
+ZEND_FUNCTION(wcli_set_code_page)
+{
+	zend_long cp;
+
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_LONG(cp)
+	ZEND_PARSE_PARAMETERS_END();
+
+	RETURN_BOOL(SetConsoleCP(cp));
+}
+
 
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************

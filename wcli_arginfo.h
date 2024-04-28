@@ -1,3 +1,6 @@
+// ********************************************************************
+// ************************* HANDLE FUNCTIONS *************************
+// ********************************************************************
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_wcli_get_output_handle, 0, 0, MAY_BE_BOOL|MAY_BE_LONG)
 ZEND_END_ARG_INFO()
@@ -9,7 +12,9 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_wcli_get_window_handle, 0, 0, MA
 ZEND_END_ARG_INFO()
 
 
-
+// ********************************************************************
+// ************************* CONSOLE FUNCTIONS ************************
+// ********************************************************************
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_wcli_get_console_size, 0, 0, MAY_BE_BOOL|MAY_BE_ARRAY)
 ZEND_END_ARG_INFO()
@@ -28,6 +33,17 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_set_buffer_size, 0, 2, _IS_
 	ZEND_ARG_TYPE_INFO(0, h, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_get_code_page, 0, 0, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_set_code_page, 0, 1, _IS_BOOL, 0)
+	ZEND_ARG_TYPE_INFO(0, cp, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+
+
+
+
 
 
 
@@ -40,6 +56,10 @@ ZEND_FUNCTION(wcli_get_console_size);
 ZEND_FUNCTION(wcli_set_console_size);
 ZEND_FUNCTION(wcli_get_buffer_size);
 ZEND_FUNCTION(wcli_set_buffer_size);
+ZEND_FUNCTION(wcli_get_code_page);
+ZEND_FUNCTION(wcli_set_code_page);
+
+
 
 
 
@@ -53,6 +73,8 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(wcli_set_console_size, arginfo_wcli_set_console_size)
 	ZEND_FE(wcli_get_buffer_size, arginfo_wcli_get_buffer_size)
 	ZEND_FE(wcli_set_buffer_size, arginfo_wcli_set_buffer_size)
+	ZEND_FE(wcli_get_code_page, arginfo_wcli_get_code_page)
+	ZEND_FE(wcli_set_code_page, arginfo_wcli_set_code_page)
 
 	ZEND_FE_END
 };

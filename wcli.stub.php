@@ -66,3 +66,23 @@ function wcli_get_buffer_size(): array|bool {}
  * @return bool True if success, else false.
  */
 function wcli_set_buffer_size(int $w, int $h): bool {}
+
+
+/**
+ * Retrieves the input code page used by the console.
+ * See: https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers
+ *
+ * @return int Code Page ID
+ */
+function wcli_get_code_page(): int {}
+
+
+/**
+ * Set the input code page used by the console.
+ * See: https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers
+ *
+ * @param int $cpID Code Page ID
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_set_code_page(int $cpID): bool {}
