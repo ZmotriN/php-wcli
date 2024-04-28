@@ -281,7 +281,8 @@ ZEND_FUNCTION(wcli_set_code_page)
 // ********************************************************************
 
 
-ZEND_FUNCTION(wcli_get_foreground_color) {
+ZEND_FUNCTION(wcli_get_foreground_color)
+{
 	CONSOLE_SCREEN_BUFFER_INFO info;
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -293,7 +294,8 @@ ZEND_FUNCTION(wcli_get_foreground_color) {
 }
 
 
-ZEND_FUNCTION(wcli_set_foreground_color) {
+ZEND_FUNCTION(wcli_set_foreground_color)
+{
 	CONSOLE_SCREEN_BUFFER_INFO info;
 	zend_long fore;
 	
@@ -309,7 +311,8 @@ ZEND_FUNCTION(wcli_set_foreground_color) {
 }
 
 
-ZEND_FUNCTION(wcli_get_background_color) {
+ZEND_FUNCTION(wcli_get_background_color)
+{
 	CONSOLE_SCREEN_BUFFER_INFO info;
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -321,7 +324,8 @@ ZEND_FUNCTION(wcli_get_background_color) {
 }
 
 
-ZEND_FUNCTION(wcli_set_background_color) {
+ZEND_FUNCTION(wcli_set_background_color)
+{
 	CONSOLE_SCREEN_BUFFER_INFO info;
 	zend_long back;
 
@@ -337,7 +341,8 @@ ZEND_FUNCTION(wcli_set_background_color) {
 }
 
 
-ZEND_FUNCTION(wcli_get_colors){
+ZEND_FUNCTION(wcli_get_colors)
+{
 	CONSOLE_SCREEN_BUFFER_INFO info;
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -351,7 +356,8 @@ ZEND_FUNCTION(wcli_get_colors){
 }
 
 
-ZEND_FUNCTION(wcli_set_colors) {
+ZEND_FUNCTION(wcli_set_colors)
+{
 	zend_long fore, back;
 
 	ZEND_PARSE_PARAMETERS_START(2, 2)
@@ -364,6 +370,24 @@ ZEND_FUNCTION(wcli_set_colors) {
 	
 	RETURN_BOOL(TRUE);
 }
+
+
+ZEND_FUNCTION(wcli_inverse_colors)
+{
+	CONSOLE_SCREEN_BUFFER_INFO info;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	if(!SetConsoleTextAttribute(WCLI_G(chnd), ((info.wAttributes & 0xF) << 4) | (info.wAttributes >> 4))) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(TRUE);
+}
+
+
+
+
 
 
 // ********************************************************************

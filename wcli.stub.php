@@ -193,3 +193,11 @@ function wcli_get_colors(): array|bool {}
  * @return bool True if success, else false.
  */
 function wcli_set_colors(int $fore, int $back): bool {}
+
+
+/**
+ * Swap foreground and background colors.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_inverse_colors(): bool {}
