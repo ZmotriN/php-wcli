@@ -145,3 +145,13 @@ function wcli_set_code_page(int $cpID): bool {}
  * @return int Color Constant
  */
 function wcli_get_foreground_color(): int {}
+
+
+/**
+ * Set the foreground color.
+ *
+ * @param int $color Color Constant
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_set_foreground_color(int $color): bool {}

@@ -82,7 +82,7 @@ PHP_RSHUTDOWN_FUNCTION(wcli)
 	if(WCLI_G(console)){
 		flush_input_buffer();
 		SetConsoleTextAttribute(WCLI_G(chnd), WCLI_G(screen).wAttributes);
-		SetConsoleCursorInfo(WCLI_G(chnd),&WCLI_G(cursor));
+		SetConsoleCursorInfo(WCLI_G(chnd), &WCLI_G(cursor));
 	}
 	return SUCCESS;
 }
@@ -293,6 +293,20 @@ ZEND_FUNCTION(wcli_get_foreground_color) {
 }
 
 
+ZEND_FUNCTION(wcli_set_foreground_color) {
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	zend_long fore;
+	
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_LONG(fore)
+	ZEND_PARSE_PARAMETERS_END();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	if(!SetConsoleTextAttribute(WCLI_G(chnd), (info.wAttributes & 0xF0) | fore)) RETURN_BOOL(FALSE);
+	
+	RETURN_BOOL(true);
+}
 
 
 
