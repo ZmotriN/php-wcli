@@ -41,7 +41,12 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_set_code_page, 0, 1, _IS_BO
 ZEND_END_ARG_INFO()
 
 
+// ********************************************************************
+// ************************* COLORS FUNCTIONS *************************
+// ********************************************************************
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_wcli_get_foreground_color, 0, 0, MAY_BE_BOOL|MAY_BE_LONG)
+ZEND_END_ARG_INFO()
 
 
 
@@ -59,6 +64,8 @@ ZEND_FUNCTION(wcli_set_buffer_size);
 ZEND_FUNCTION(wcli_get_code_page);
 ZEND_FUNCTION(wcli_set_code_page);
 
+ZEND_FUNCTION(wcli_get_foreground_color);
+
 
 
 
@@ -75,6 +82,8 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(wcli_set_buffer_size, arginfo_wcli_set_buffer_size)
 	ZEND_FE(wcli_get_code_page, arginfo_wcli_get_code_page)
 	ZEND_FE(wcli_set_code_page, arginfo_wcli_set_code_page)
+
+	ZEND_FE(wcli_get_foreground_color, arginfo_wcli_get_foreground_color)
 
 	ZEND_FE_END
 };

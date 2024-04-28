@@ -1,6 +1,57 @@
 <?php
 
 /**
+ * Red color
+ */
+const Red = 4;
+
+/**
+ * Green color
+ */
+const Green = 2;
+
+/**
+ * Blue color
+ */
+const Blue = 1; 
+
+/**
+ * Yellow color
+ */
+const Yellow = 14;
+
+/**
+ * Purple color
+ */
+const Purple = 5;
+
+/**
+ * Aqua color
+ */
+const Aqua = 3; 
+
+/**
+ * White color
+ */
+const White = 7;
+
+/**
+ * Black color
+ */
+const Black = 0;
+
+/**
+ * Grey color
+ */
+const Grey = 8;
+
+/**
+ * Bright Flag
+ */
+const Bright = 8;
+
+
+/**
  * Get the console output handle.
  *
  * @return int|bool Output handle
@@ -86,3 +137,11 @@ function wcli_get_code_page(): int {}
  * @return bool True if success, else false.
  */
 function wcli_set_code_page(int $cpID): bool {}
+
+
+/**
+ * Get the foreground color.
+ *
+ * @return int Color Constant
+ */
+function wcli_get_foreground_color(): int {}
