@@ -501,6 +501,21 @@ ZEND_FUNCTION(wcli_set_cursor_size)
 }
 
 
+ZEND_FUNCTION(wcli_get_cursor_position)
+{
+	CONSOLE_SCREEN_BUFFER_INFO info;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	
+	array_init(return_value);
+	add_index_long(return_value, 0, info.dwCursorPosition.X);
+	add_index_long(return_value, 1, info.dwCursorPosition.Y);
+}
+
+
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************
 // ********************************************************************

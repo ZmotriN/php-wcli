@@ -262,3 +262,12 @@ function wcli_get_cursor_size(): int|bool {}
  * @return bool True if success, else false.
  */
 function wcli_set_cursor_size(int $size): bool {}
+
+
+/**
+ * Retrieve cursor position.
+ * Return an array [x, y]
+ *
+ * @return array|bool The cursor position or false.
+ */
+function wcli_get_cursor_position(): array|bool {}
