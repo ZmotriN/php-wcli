@@ -201,3 +201,19 @@ function wcli_set_colors(int $fore, int $back): bool {}
  * @return bool True if success, else false.
  */
 function wcli_inverse_colors(): bool {}
+
+
+/**
+ * Reset console colors to default.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_reset_colors(): bool {}
+
+
+/**
+ * Hide console cursor.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_hide_cursor(): bool {}

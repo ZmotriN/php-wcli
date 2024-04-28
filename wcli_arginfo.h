@@ -70,6 +70,20 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_inverse_colors, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_reset_colors, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
+
+// ********************************************************************
+// ************************* CURSOR FUNCTIONS *************************
+// ********************************************************************
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_hide_cursor, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
+
+
+
 
 
 
@@ -91,6 +105,10 @@ ZEND_FUNCTION(wcli_set_background_color);
 ZEND_FUNCTION(wcli_get_colors);
 ZEND_FUNCTION(wcli_set_colors);
 ZEND_FUNCTION(wcli_inverse_colors);
+ZEND_FUNCTION(wcli_reset_colors);
+
+ZEND_FUNCTION(wcli_hide_cursor);
+
 
 
 
@@ -116,6 +134,10 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(wcli_get_colors, arginfo_wcli_get_colors)
 	ZEND_FE(wcli_set_colors, arginfo_wcli_set_colors)
 	ZEND_FE(wcli_inverse_colors, arginfo_wcli_inverse_colors)
+	ZEND_FE(wcli_reset_colors, arginfo_wcli_reset_colors)
+
+	ZEND_FE(wcli_hide_cursor, arginfo_wcli_hide_cursor)
+
 
 
 

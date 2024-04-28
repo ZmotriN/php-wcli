@@ -386,8 +386,37 @@ ZEND_FUNCTION(wcli_inverse_colors)
 }
 
 
+ZEND_FUNCTION(wcli_reset_colors)
+{
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!SetConsoleTextAttribute(WCLI_G(chnd), WCLI_G(screen).wAttributes)) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(TRUE);
+}
 
 
+
+// ********************************************************************
+// ************************* CURSOR FUNCTIONS *************************
+// ********************************************************************
+
+
+ZEND_FUNCTION(wcli_hide_cursor)
+{
+	CONSOLE_CURSOR_INFO info;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleCursorInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	
+	info.bVisible = FALSE;
+	if(!SetConsoleCursorInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	
+	RETURN_BOOL(TRUE);
+}
 
 
 // ********************************************************************
