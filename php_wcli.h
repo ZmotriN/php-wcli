@@ -32,12 +32,12 @@ ZEND_TSRMLS_CACHE_EXTERN()
 # endif
 
 
-void flush_input_buffer();
-HWND get_console_window_handle();
-BOOL is_cmd_call();
-BOOL get_parent_proc(PROCESSENTRY32 *parent);
-DWORD get_parent_pid();
-HWND get_proc_window(DWORD pid);
+static void flush_input_buffer();
+static HWND get_console_window_handle();
+static BOOL is_cmd_call();
+static BOOL get_parent_proc(PROCESSENTRY32 *parent);
+static DWORD get_parent_pid();
+static HWND get_proc_window(DWORD pid);
 
 
 #endif	/* PHP_WCLI_H */

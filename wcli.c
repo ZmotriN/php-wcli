@@ -425,7 +425,7 @@ ZEND_FUNCTION(wcli_hide_cursor)
 
 
 // Flush Input Console Buffer
-void flush_input_buffer()
+static void flush_input_buffer()
 {
 	int i, k;
 	for(k = 1; k;) {
@@ -440,7 +440,7 @@ void flush_input_buffer()
 
 
 // Get Current Console Window Handle
-HWND get_console_window_handle()
+static HWND get_console_window_handle()
 {
 	DWORD pid;
 
@@ -456,7 +456,7 @@ HWND get_console_window_handle()
 
 
 // Get if it is a command line call or an explorer call;
-BOOL is_cmd_call()
+static BOOL is_cmd_call()
 {
 	PROCESSENTRY32 proc;
 
@@ -479,7 +479,7 @@ BOOL is_cmd_call()
 
 
 // Get Parent Process Info
-BOOL get_parent_proc(PROCESSENTRY32 *parent)
+static BOOL get_parent_proc(PROCESSENTRY32 *parent)
 {
 	HANDLE hsnap;
 	BOOL ctn;
@@ -519,7 +519,7 @@ BOOL get_parent_proc(PROCESSENTRY32 *parent)
 
 
 // Get Parent Process PID
-DWORD get_parent_pid()
+static DWORD get_parent_pid()
 {
 	PROCESSENTRY32 proc;
 	if(!get_parent_proc(&proc)) return 0;
@@ -528,7 +528,7 @@ DWORD get_parent_pid()
 
 
 // Get Process Main Window Handle
-HWND get_proc_window(DWORD pid)
+static HWND get_proc_window(DWORD pid)
 {
 	HWND whnd, parent, owner;
 	DWORD wpid;
