@@ -540,6 +540,33 @@ ZEND_FUNCTION(wcli_set_cursor_position)
 }
 
 
+ZEND_FUNCTION(wcli_move_cursor)
+{
+	COORD pos;
+	zend_long x, y;
+	CONSOLE_SCREEN_BUFFER_INFO info;
+
+	ZEND_PARSE_PARAMETERS_START(2, 2)
+		Z_PARAM_LONG(x)
+		Z_PARAM_LONG(y)
+	ZEND_PARSE_PARAMETERS_END();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	
+	pos.X = x + info.dwCursorPosition.X;
+	pos.Y = y + info.dwCursorPosition.Y;
+	if(pos.X < 0) pos.X = 0;
+	if(pos.Y < 0) pos.Y = 0;
+	if(pos.X >= (info.srWindow.Right - info.srWindow.Left + 1)) pos.X = info.srWindow.Right - info.srWindow.Left;
+	if(pos.Y >= (info.srWindow.Bottom - info.srWindow.Top + 1)) pos.Y = info.srWindow.Bottom - info.srWindow.Top;
+	if(!SetConsoleCursorPosition(WCLI_G(chnd), pos)) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(TRUE);
+}
+
+
+
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************
 // ********************************************************************

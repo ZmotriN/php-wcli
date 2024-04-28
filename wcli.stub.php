@@ -282,3 +282,14 @@ function wcli_get_cursor_position(): array|bool {}
  * @return bool True if success, else false.
  */
 function wcli_set_cursor_position(int $x, int $y): bool {}
+
+
+/**
+ * Move cursor position relatively to the current cursor position.
+ *
+ * @param int $x X move in characters
+ * @param int $y Y move in characters
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_move_cursor(int $x, int $y): bool {}
