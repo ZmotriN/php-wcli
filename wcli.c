@@ -480,6 +480,26 @@ ZEND_FUNCTION(wcli_get_cursor_size)
 }
 
 
+ZEND_FUNCTION(wcli_set_cursor_size)
+{
+	CONSOLE_CURSOR_INFO info;
+	zend_long size;
+
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_LONG(size)
+	ZEND_PARSE_PARAMETERS_END();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleCursorInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	
+	if(size < 1) size = 1;
+	else if(size > 100) size = 100;
+	info.dwSize = size;
+	if(!SetConsoleCursorInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	
+	RETURN_BOOL(TRUE);
+}
+
 
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************

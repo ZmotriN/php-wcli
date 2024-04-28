@@ -236,7 +236,7 @@ function wcli_get_cursor_visibility(): bool {}
 
 
 /**
- * Set cursor visibility
+ * Set cursor visibility.
  *
  * @param bool $visible True to show, false to hide.
  *
@@ -246,8 +246,19 @@ function wcli_set_cursor_visibility(bool $visible): bool {}
 
 
 /**
- * Method wcli_get_cursor_size
+ * Retrieve cursor size.
+ * The size value is between 0 and 100.
  *
  * @return int|bool The cursor size if success, else false.
  */
 function wcli_get_cursor_size(): int|bool {}
+
+
+/**
+ * Set cursor size.
+ *
+ * @param int $size Cursor size between 0 and 100.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_set_cursor_size(int $size): bool {}
