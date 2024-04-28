@@ -173,3 +173,12 @@ function wcli_get_background_color(): int {}
  * @return bool True if success, else false.
  */
 function wcli_set_background_color(int $color): bool {}
+
+
+/**
+ * Retrieve console foreground and background colors.
+ * Return an array [foreColor, backColor]
+ *
+ * @return array|bool The array of colors or False
+ */
+function wcli_get_colors(): array|bool {}
