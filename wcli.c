@@ -516,6 +516,30 @@ ZEND_FUNCTION(wcli_get_cursor_position)
 }
 
 
+ZEND_FUNCTION(wcli_set_cursor_position)
+{
+	COORD pos;
+	zend_long x, y;
+	CONSOLE_SCREEN_BUFFER_INFO info;
+
+	ZEND_PARSE_PARAMETERS_START(2, 2)
+		Z_PARAM_LONG(x)
+		Z_PARAM_LONG(y)
+	ZEND_PARSE_PARAMETERS_END();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+
+	pos.X = x;
+	pos.Y = y;
+	if(pos.X < 0) pos.X = 0;
+	if(pos.Y < 0) pos.Y = 0;
+	if(!SetConsoleCursorPosition(WCLI_G(chnd), pos)) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(TRUE);
+}
+
+
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************
 // ********************************************************************

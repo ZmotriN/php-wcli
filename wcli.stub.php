@@ -271,3 +271,14 @@ function wcli_set_cursor_size(int $size): bool {}
  * @return array|bool The cursor position or false.
  */
 function wcli_get_cursor_position(): array|bool {}
+
+
+/**
+ * Set cursor position.
+ *
+ * @param int $x X position in characters
+ * @param int $y Y position in characters
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_set_cursor_position(int $x, int $y): bool {}
