@@ -351,7 +351,19 @@ ZEND_FUNCTION(wcli_get_colors){
 }
 
 
+ZEND_FUNCTION(wcli_set_colors) {
+	zend_long fore, back;
 
+	ZEND_PARSE_PARAMETERS_START(2, 2)
+		Z_PARAM_LONG(fore)
+		Z_PARAM_LONG(back)
+	ZEND_PARSE_PARAMETERS_END();
+	
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!SetConsoleTextAttribute(WCLI_G(chnd), (back << 4) | fore)) RETURN_BOOL(FALSE);
+	
+	RETURN_BOOL(TRUE);
+}
 
 
 // ********************************************************************

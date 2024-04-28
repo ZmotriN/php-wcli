@@ -182,3 +182,14 @@ function wcli_set_background_color(int $color): bool {}
  * @return array|bool The array of colors or False
  */
 function wcli_get_colors(): array|bool {}
+
+
+/**
+ * Set the foreground and background color at once.
+ *
+ * @param int $fore Foreground color constant
+ * @param int $back Background color constant
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_set_colors(int $fore, int $back): bool {}
