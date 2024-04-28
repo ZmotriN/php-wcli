@@ -163,3 +163,13 @@ function wcli_set_foreground_color(int $color): bool {}
  * @return int Color Constant
  */
 function wcli_get_background_color(): int {}
+
+
+/**
+ * Set the background color.
+ *
+ * @param int $color Color constant
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_set_background_color(int $color): bool {}

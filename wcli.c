@@ -321,6 +321,21 @@ ZEND_FUNCTION(wcli_get_background_color) {
 }
 
 
+ZEND_FUNCTION(wcli_set_background_color) {
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	zend_long back;
+
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_LONG(back)
+	ZEND_PARSE_PARAMETERS_END();
+	
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	if(!SetConsoleTextAttribute(WCLI_G(chnd), (info.wAttributes & 0x0F) | (back << 4))) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(TRUE);
+}
+
 
 
 // ********************************************************************
