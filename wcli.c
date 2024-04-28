@@ -1,4 +1,8 @@
-/* wcli extension for PHP */
+
+// ********************************************************************
+// ************************ EXTENSION POUTINE *************************
+// ********************************************************************
+
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -93,6 +97,7 @@ ZEND_GET_MODULE(wcli)
 #endif
 
 
+
 // ********************************************************************
 // ************************* HANDLE FUNCTIONS *************************
 // ********************************************************************
@@ -156,7 +161,7 @@ ZEND_FUNCTION(wcli_set_console_size) {
 	COORD bsize;
 	COORD buff;
 
-	ZEND_PARSE_PARAMETERS_START(1, 3)
+	ZEND_PARSE_PARAMETERS_START(2, 3)
 		Z_PARAM_LONG(w)
 		Z_PARAM_LONG(h)
 		Z_PARAM_OPTIONAL
@@ -175,7 +180,8 @@ ZEND_FUNCTION(wcli_set_console_size) {
 	if(h > info.dwSize.Y) buff.Y = h;
 
 	if(buff.X != info.dwSize.X || buff.Y != info.dwSize.Y)
-		if(!SetConsoleScreenBufferSize(WCLI_G(chnd), buff)) RETURN_BOOL(FALSE);
+		if(!SetConsoleScreenBufferSize(WCLI_G(chnd), buff))
+			RETURN_BOOL(FALSE);
 
 	size.Top = 0;
 	size.Left = 0;
@@ -205,6 +211,24 @@ ZEND_FUNCTION(wcli_get_buffer_size) {
 }
 
 
+ZEND_FUNCTION(wcli_set_buffer_size) {
+	zend_long w, h;
+	COORD bsize;
+
+	ZEND_PARSE_PARAMETERS_START(2, 2)
+		Z_PARAM_LONG(w)
+		Z_PARAM_LONG(h)
+	ZEND_PARSE_PARAMETERS_END();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	
+	bsize.X = w;
+	bsize.Y = h;
+	if(!SetConsoleScreenBufferSize(WCLI_G(chnd), bsize)) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(TRUE);
+}
+
 
 
 // ********************************************************************
@@ -216,9 +240,9 @@ ZEND_FUNCTION(wcli_get_buffer_size) {
 void flush_input_buffer()
 {
 	int i, k;
-	for(k = 1; k;){
-		for(i = 1; i <= 256; i++){
-			if(k = GetAsyncKeyState(i) & 0x7FFF){
+	for(k = 1; k;) {
+		for(i = 1; i <= 256; i++) {
+			if(k = GetAsyncKeyState(i) & 0x7FFF) {
 				break;
 			}
 		}

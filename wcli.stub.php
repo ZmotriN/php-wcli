@@ -53,3 +53,16 @@ function wcli_set_console_size(int $w, int $h, bool $force = false): bool {}
  * @return array|bool Return the buffer size or FALSE.
  */
 function wcli_get_buffer_size(): array|bool {}
+
+
+/**
+ * Set the console buffer size in characters.
+ * The buffer size need to be bigger than the console size.
+ * Otherwise, set the console size before the buffer size.
+ *
+ * @param int $w Width of the buffer in characters
+ * @param int $h Height of the buffer in characters
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_set_buffer_size(int $w, int $h): bool {}
