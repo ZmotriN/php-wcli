@@ -26,17 +26,15 @@ PHP_RINIT_FUNCTION(wcli)
 	WCLI_G(chnd) = GetStdHandle(STD_OUTPUT_HANDLE);
 	if(WCLI_G(chnd) != NULL && WCLI_G(chnd) != INVALID_HANDLE_VALUE) WCLI_G(console) = TRUE;
 	else WCLI_G(console) = FALSE;
-	if(WCLI_G(console)){
+	if(WCLI_G(console)) {
 		WCLI_G(ihnd) = GetStdHandle(STD_INPUT_HANDLE);
 		WCLI_G(parent).dwSize = 0;
 		WCLI_G(whnd) = NULL;
 		WCLI_G(cmdcall) = FALSE;
 		WCLI_G(cmdcalli) = FALSE;
-
-		GetConsoleScreenBufferInfo(WCLI_G(chnd),&WCLI_G(screen));
-		GetConsoleCursorInfo(WCLI_G(chnd),&WCLI_G(cursor));
-		GetCurrentConsoleFont(WCLI_G(chnd),FALSE,&WCLI_G(font));
-
+		GetConsoleScreenBufferInfo(WCLI_G(chnd), &WCLI_G(screen));
+		GetConsoleCursorInfo(WCLI_G(chnd), &WCLI_G(cursor));
+		GetCurrentConsoleFont(WCLI_G(chnd), FALSE, &WCLI_G(font));
 		flush_input_buffer();
 	}
 
@@ -133,43 +131,44 @@ ZEND_FUNCTION(wcli_get_console_size)
 	int sx,sy;
 	CONSOLE_SCREEN_BUFFER_INFO info;
 
+	ZEND_PARSE_PARAMETERS_NONE();
+
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
-	ZEND_PARSE_PARAMETERS_NONE();
-	
+
 	array_init(return_value);
 	whnd = get_console_window_handle();
 	sx = GetScrollPos(whnd, SB_HORZ);
 	sy = GetScrollPos(whnd, SB_VERT);
-	add_assoc_long(return_value, "w", info.srWindow.Right - info.srWindow.Left + 1);
-	add_assoc_long(return_value, "h", info.srWindow.Bottom - info.srWindow.Top + 1);
-	add_assoc_long(return_value, "x", sx);
-	add_assoc_long(return_value, "y", sy);
+
+	add_index_long(return_value, 0, info.srWindow.Right - info.srWindow.Left + 1);
+	add_index_long(return_value, 1, info.srWindow.Bottom - info.srWindow.Top + 1);
+	add_index_long(return_value, 2, sx);
+	add_index_long(return_value, 3, sy);
 }
 
 
 ZEND_FUNCTION(wcli_set_console_size) {
 	CONSOLE_SCREEN_BUFFER_INFO info;
-	BOOL force = FALSE;
+	zend_bool force = FALSE;
 	SMALL_RECT size;
 	zend_long w, h, bh;
 	COORD bsize;
 	COORD buff;
-	
+
 	ZEND_PARSE_PARAMETERS_START(1, 3)
 		Z_PARAM_LONG(w)
 		Z_PARAM_LONG(h)
 		Z_PARAM_OPTIONAL
 		Z_PARAM_BOOL(force)
 	ZEND_PARSE_PARAMETERS_END();
-		
+
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	bh = info.dwSize.Y;
 	if(force) bh = h;
-	
+
 	buff.X = info.dwSize.X;
 	buff.Y = info.dwSize.Y;
 	if(w > info.dwSize.X) buff.X = w;
@@ -183,14 +182,27 @@ ZEND_FUNCTION(wcli_set_console_size) {
 	size.Right = w-1;
 	size.Bottom = h-1;
 	if(!SetConsoleWindowInfo(WCLI_G(chnd), TRUE, &size)) RETURN_BOOL(FALSE);
-	
+
 	bsize.X = w;
 	bsize.Y = bh;
 	if(!SetConsoleScreenBufferSize(WCLI_G(chnd), bsize)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_BOOL(TRUE);
 }
 
+
+ZEND_FUNCTION(wcli_get_buffer_size) {
+	CONSOLE_SCREEN_BUFFER_INFO info;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	
+	array_init(return_value);
+	add_index_long(return_value, 0, info.dwSize.X);
+	add_index_long(return_value, 1, info.dwSize.Y);
+}
 
 
 
@@ -235,7 +247,7 @@ HWND get_console_window_handle()
 BOOL is_cmd_call()
 {
 	PROCESSENTRY32 proc;
-	
+
 	// Lazy stuff
 	if(WCLI_G(cmdcalli)) return WCLI_G(cmdcall);
 
@@ -261,7 +273,7 @@ BOOL get_parent_proc(PROCESSENTRY32 *parent)
 	BOOL ctn;
 	DWORD pid;
 	PROCESSENTRY32 proc;
-	
+
 	// Lazy stuff
 	if(WCLI_G(parent).dwSize != 0) {
 		memcpy(parent, &WCLI_G(parent), sizeof(PROCESSENTRY32));
@@ -308,7 +320,7 @@ HWND get_proc_window(DWORD pid)
 {
 	HWND whnd, parent, owner;
 	DWORD wpid;
-	
+
 	for(whnd = FindWindow(NULL, NULL); whnd != NULL; whnd = GetWindow(whnd, GW_HWNDNEXT)){
 		parent = GetParent(whnd);
 		GetWindowThreadProcessId(whnd, &wpid);

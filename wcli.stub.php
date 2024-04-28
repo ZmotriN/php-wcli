@@ -28,7 +28,7 @@ function wcli_get_window_handle(): int|bool {}
  * Retrieve the size and the scrolling in characters of the console.
  * Return an array [w, h, x, y]
  *
- * @return array|bool
+ * @return array|bool Return the console size or FALSE.
  */
 function wcli_get_console_size(): array|bool {}
 
@@ -44,3 +44,12 @@ function wcli_get_console_size(): array|bool {}
  * @return bool True if success, else false.
  */
 function wcli_set_console_size(int $w, int $h, bool $force = false): bool {}
+
+
+/**
+ * Retrieve console buffer size in characters.
+ * Return an array [w, h]
+ *
+ * @return array|bool Return the buffer size or FALSE.
+ */
+function wcli_get_buffer_size(): array|bool {}
