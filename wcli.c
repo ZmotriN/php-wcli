@@ -153,7 +153,7 @@ ZEND_FUNCTION(wcli_set_console_size) {
 	CONSOLE_SCREEN_BUFFER_INFO info;
 	BOOL force = FALSE;
 	SMALL_RECT size;
-	SHORT w, h, bh;
+	zend_long w, h, bh;
 	COORD bsize;
 	COORD buff;
 	
