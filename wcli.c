@@ -568,6 +568,45 @@ ZEND_FUNCTION(wcli_move_cursor)
 
 
 // ********************************************************************
+// ************************* OUTPUT FUNCTIONS *************************
+// ********************************************************************
+
+
+ZEND_FUNCTION(wcli_echo)
+{
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	zend_long fore, back;
+	zend_bool fore_isnull = 1, back_isnull = 1;
+	char *str;
+	size_t size;
+	DWORD bytes;
+
+	ZEND_PARSE_PARAMETERS_START(1, 3)
+		Z_PARAM_STRING(str, size)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_LONG_OR_NULL(fore, fore_isnull)
+		Z_PARAM_LONG_OR_NULL(back, back_isnull)
+	ZEND_PARSE_PARAMETERS_END();
+	
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	
+	if(fore_isnull) fore = info.wAttributes & 0xF;
+	if(back_isnull) back = info.wAttributes >> 4;
+
+	if(!SetConsoleTextAttribute(WCLI_G(chnd), (back << 4) | fore)) RETURN_BOOL(FALSE);
+	if(!WriteConsole(WCLI_G(chnd), str, size, &bytes, NULL)) RETURN_BOOL(FALSE);
+	if(!SetConsoleTextAttribute(WCLI_G(chnd), info.wAttributes)) RETURN_BOOL(FALSE);
+	
+	RETURN_BOOL(TRUE);
+}
+
+
+
+
+
+
+// ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************
 // ********************************************************************
 

@@ -293,3 +293,15 @@ function wcli_set_cursor_position(int $x, int $y): bool {}
  * @return bool True if success, else false.
  */
 function wcli_move_cursor(int $x, int $y): bool {}
+
+
+/**
+ * Echo string with colors. Foreground and background colors are optionals.
+ *
+ * @param string $str String to be echo.
+ * @param int $fore Foreground color constant
+ * @param int $back Background color constant
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_echo(string $str, int $fore = null, int $back = null): bool {}

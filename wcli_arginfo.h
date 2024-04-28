@@ -112,7 +112,15 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_set_cursor_position, 0, 2, 
 ZEND_END_ARG_INFO()
 
 
+// ********************************************************************
+// ************************* OUTPUT FUNCTIONS *************************
+// ********************************************************************
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_echo, 0, 1, _IS_BOOL, 0)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, fore, IS_LONG, 1, "null")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, back, IS_LONG, 1, "null")
+ZEND_END_ARG_INFO()
 
 
 
@@ -145,6 +153,8 @@ ZEND_FUNCTION(wcli_set_cursor_size);
 ZEND_FUNCTION(wcli_get_cursor_position);
 ZEND_FUNCTION(wcli_set_cursor_position);
 ZEND_FUNCTION(wcli_move_cursor);
+
+ZEND_FUNCTION(wcli_echo);
 
 
 
@@ -184,6 +194,8 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(wcli_get_cursor_position, arginfo_wcli_get_cursor_position)
 	ZEND_FE(wcli_set_cursor_position, arginfo_wcli_set_cursor_position)
 	ZEND_FE(wcli_move_cursor, arginfo_wcli_move_cursor)
+
+	ZEND_FE(wcli_echo, arginfo_wcli_echo)
 
 
 
