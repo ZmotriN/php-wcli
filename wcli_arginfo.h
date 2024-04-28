@@ -30,6 +30,8 @@ ZEND_END_ARG_INFO()
 
 
 
+
+
 ZEND_FUNCTION(wcli_get_output_handle);
 ZEND_FUNCTION(wcli_get_input_handle);
 ZEND_FUNCTION(wcli_get_window_handle);

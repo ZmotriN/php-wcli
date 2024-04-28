@@ -103,23 +103,32 @@ ZEND_GET_MODULE(wcli)
 // ********************************************************************
 
 
-ZEND_FUNCTION(wcli_get_output_handle) {
+ZEND_FUNCTION(wcli_get_output_handle)
+{
 	ZEND_PARSE_PARAMETERS_NONE();
+	
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	
 	RETURN_LONG((zend_long)WCLI_G(chnd));
 }
 
 
-ZEND_FUNCTION(wcli_get_input_handle) {
+ZEND_FUNCTION(wcli_get_input_handle)
+{
 	ZEND_PARSE_PARAMETERS_NONE();
+	
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	
 	RETURN_LONG((zend_long)WCLI_G(ihnd));
 }
 
 
-ZEND_FUNCTION(wcli_get_window_handle) {
+ZEND_FUNCTION(wcli_get_window_handle)
+{
 	ZEND_PARSE_PARAMETERS_NONE();
+	
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	
 	RETURN_LONG((zend_long)get_console_window_handle());
 }
 
@@ -141,11 +150,11 @@ ZEND_FUNCTION(wcli_get_console_size)
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
 
-	array_init(return_value);
 	whnd = get_console_window_handle();
 	sx = GetScrollPos(whnd, SB_HORZ);
 	sy = GetScrollPos(whnd, SB_VERT);
-
+	
+	array_init(return_value);
 	add_index_long(return_value, 0, info.srWindow.Right - info.srWindow.Left + 1);
 	add_index_long(return_value, 1, info.srWindow.Bottom - info.srWindow.Top + 1);
 	add_index_long(return_value, 2, sx);
@@ -153,7 +162,8 @@ ZEND_FUNCTION(wcli_get_console_size)
 }
 
 
-ZEND_FUNCTION(wcli_set_console_size) {
+ZEND_FUNCTION(wcli_set_console_size)
+{
 	CONSOLE_SCREEN_BUFFER_INFO info;
 	zend_bool force = FALSE;
 	SMALL_RECT size;
@@ -197,7 +207,8 @@ ZEND_FUNCTION(wcli_set_console_size) {
 }
 
 
-ZEND_FUNCTION(wcli_get_buffer_size) {
+ZEND_FUNCTION(wcli_get_buffer_size)
+{
 	CONSOLE_SCREEN_BUFFER_INFO info;
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -211,7 +222,8 @@ ZEND_FUNCTION(wcli_get_buffer_size) {
 }
 
 
-ZEND_FUNCTION(wcli_set_buffer_size) {
+ZEND_FUNCTION(wcli_set_buffer_size)
+{
 	zend_long w, h;
 	COORD bsize;
 
