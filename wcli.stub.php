@@ -243,3 +243,11 @@ function wcli_get_cursor_visibility(): bool {}
  * @return bool True if success, else false.
  */
 function wcli_set_cursor_visibility(bool $visible): bool {}
+
+
+/**
+ * Method wcli_get_cursor_size
+ *
+ * @return int|bool The cursor size if success, else false.
+ */
+function wcli_get_cursor_size(): int|bool {}

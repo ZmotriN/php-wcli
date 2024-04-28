@@ -91,6 +91,9 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_set_cursor_visibility, 0, 1
 	ZEND_ARG_TYPE_INFO(0, visible, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_wcli_get_cursor_size, 0, 0, MAY_BE_BOOL|MAY_BE_LONG)
+ZEND_END_ARG_INFO()
+
 
 
 
@@ -119,6 +122,7 @@ ZEND_FUNCTION(wcli_hide_cursor);
 ZEND_FUNCTION(wcli_show_cursor);
 ZEND_FUNCTION(wcli_get_cursor_visibility);
 ZEND_FUNCTION(wcli_set_cursor_visibility);
+ZEND_FUNCTION(wcli_get_cursor_size);
 
 
 
@@ -153,6 +157,7 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(wcli_show_cursor, arginfo_wcli_show_cursor)
 	ZEND_FE(wcli_get_cursor_visibility, arginfo_wcli_get_cursor_visibility)
 	ZEND_FE(wcli_set_cursor_visibility, arginfo_wcli_set_cursor_visibility)
+	ZEND_FE(wcli_get_cursor_size, arginfo_wcli_get_cursor_size)
 
 
 
