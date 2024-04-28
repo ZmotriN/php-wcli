@@ -90,14 +90,14 @@ PHP_RSHUTDOWN_FUNCTION(wcli)
 
 zend_module_entry wcli_module_entry = {
 	STANDARD_MODULE_HEADER,
-	"wcli",					/* Extension name */
-	ext_functions,			/* zend_function_entry */
-	PHP_MINIT(wcli),		/* PHP_MINIT - Module initialization */
-	NULL,					/* PHP_MSHUTDOWN - Module shutdown */
-	PHP_RINIT(wcli),		/* PHP_RINIT - Request initialization */
-	PHP_RSHUTDOWN(wcli),	/* PHP_RSHUTDOWN - Request shutdown */
-	PHP_MINFO(wcli),		/* PHP_MINFO - Module info */
-	PHP_WCLI_VERSION,		/* Version */
+	"wcli",                 /* Extension name */
+	ext_functions,          /* zend_function_entry */
+	PHP_MINIT(wcli),        /* PHP_MINIT - Module initialization */
+	NULL,                   /* PHP_MSHUTDOWN - Module shutdown */
+	PHP_RINIT(wcli),        /* PHP_RINIT - Request initialization */
+	PHP_RSHUTDOWN(wcli),    /* PHP_RSHUTDOWN - Request shutdown */
+	PHP_MINFO(wcli),        /* PHP_MINFO - Module info */
+	PHP_WCLI_VERSION,       /* Version */
 	STANDARD_MODULE_PROPERTIES
 };
 
@@ -306,6 +306,18 @@ ZEND_FUNCTION(wcli_set_foreground_color) {
 	if(!SetConsoleTextAttribute(WCLI_G(chnd), (info.wAttributes & 0xF0) | fore)) RETURN_BOOL(FALSE);
 	
 	RETURN_BOOL(true);
+}
+
+
+ZEND_FUNCTION(wcli_get_background_color) {
+	CONSOLE_SCREEN_BUFFER_INFO info;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	
+	RETURN_LONG(info.wAttributes >> 4);
 }
 
 
