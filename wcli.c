@@ -146,10 +146,50 @@ ZEND_FUNCTION(wcli_get_console_size)
 	add_assoc_long(return_value, "h", info.srWindow.Bottom - info.srWindow.Top + 1);
 	add_assoc_long(return_value, "x", sx);
 	add_assoc_long(return_value, "y", sy);
-
 }
 
 
+ZEND_FUNCTION(wcli_set_console_size) {
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	BOOL force = FALSE;
+	SMALL_RECT size;
+	SHORT w, h, bh;
+	COORD bsize;
+	COORD buff;
+	
+	ZEND_PARSE_PARAMETERS_START(1, 3)
+		Z_PARAM_LONG(w)
+		Z_PARAM_LONG(h)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_BOOL(force)
+	ZEND_PARSE_PARAMETERS_END();
+		
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	
+	bh = info.dwSize.Y;
+	if(force) bh = h;
+	
+	buff.X = info.dwSize.X;
+	buff.Y = info.dwSize.Y;
+	if(w > info.dwSize.X) buff.X = w;
+	if(h > info.dwSize.Y) buff.Y = h;
+
+	if(buff.X != info.dwSize.X || buff.Y != info.dwSize.Y)
+		if(!SetConsoleScreenBufferSize(WCLI_G(chnd), buff)) RETURN_BOOL(FALSE);
+
+	size.Top = 0;
+	size.Left = 0;
+	size.Right = w-1;
+	size.Bottom = h-1;
+	if(!SetConsoleWindowInfo(WCLI_G(chnd), TRUE, &size)) RETURN_BOOL(FALSE);
+	
+	bsize.X = w;
+	bsize.Y = bh;
+	if(!SetConsoleScreenBufferSize(WCLI_G(chnd), bsize)) RETURN_BOOL(FALSE);
+	
+	RETURN_BOOL(TRUE);
+}
 
 
 
