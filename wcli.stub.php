@@ -327,3 +327,11 @@ function wcli_print(string $str, int $x = null, int $y = null, int $fore = null,
  * @return bool True if success, else false.
  */
 function wcli_clear(): bool {}
+
+
+/**
+ * Pause process and wait for a keyboard input.
+ *
+ * @return int The input character.
+ */
+function wcli_get_key(): int {}

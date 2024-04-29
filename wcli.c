@@ -659,6 +659,22 @@ ZEND_FUNCTION(wcli_clear)
 
 
 // ********************************************************************
+// ************************* INPUT FUNCTIONS **************************
+// ********************************************************************
+
+
+PHP_FUNCTION(wcli_get_key)
+{
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+
+	RETURN_LONG(get_key());
+}
+
+
+
+// ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************
 // ********************************************************************
 
@@ -781,5 +797,29 @@ static HWND get_proc_window(DWORD pid)
 		}
 	}
 
+	return 0;
+}
+
+
+// Get Keyboard Key
+static unsigned char get_key()
+{
+	unsigned int i;
+	HWND whnd;
+
+	whnd = get_console_window_handle();
+	if(!whnd) return 0;
+
+	for(flush_input_buffer();;) {
+		if(whnd == GetForegroundWindow()) {
+			for(i = 8; i <= 256; i++) {
+				if(GetAsyncKeyState(i) & 0x7FFF) {
+					FlushConsoleInputBuffer(WCLI_G(ihnd));
+					return i;
+				}
+			}
+		}
+		Sleep(1);
+	}
 	return 0;
 }
