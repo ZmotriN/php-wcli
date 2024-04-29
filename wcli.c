@@ -602,7 +602,41 @@ ZEND_FUNCTION(wcli_echo)
 }
 
 
+ZEND_FUNCTION(wcli_print)
+{
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	DWORD bytes;
+	COORD pos;
+	char *str;
+	size_t size;
+	zend_long x, y, fore, back;
+	zend_bool x_isnull = 1, y_isnull = 1, fore_isnull = 1, back_isnull = 1;
 
+	ZEND_PARSE_PARAMETERS_START(1, 5)
+		Z_PARAM_STRING(str, size)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_LONG_OR_NULL(x, x_isnull)
+		Z_PARAM_LONG_OR_NULL(y, y_isnull)
+		Z_PARAM_LONG_OR_NULL(fore, fore_isnull)
+		Z_PARAM_LONG_OR_NULL(back, back_isnull)
+	ZEND_PARSE_PARAMETERS_END();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+
+	if(x_isnull) x = info.dwCursorPosition.X;
+	if(y_isnull) y = info.dwCursorPosition.Y;
+	if(fore_isnull) fore = info.wAttributes & 0xF;
+	if(back_isnull) back = info.wAttributes >> 4;
+
+	pos.X = x;
+	pos.Y = y;
+
+	if(!FillConsoleOutputAttribute(WCLI_G(chnd), (back << 4) | fore, size, pos, &bytes))  RETURN_BOOL(FALSE);
+	if(!WriteConsoleOutputCharacter(WCLI_G(chnd), str, size, pos, &bytes)) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(TRUE);
+}
 
 
 
