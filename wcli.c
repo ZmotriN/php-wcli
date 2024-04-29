@@ -639,6 +639,24 @@ ZEND_FUNCTION(wcli_print)
 }
 
 
+ZEND_FUNCTION(wcli_clear)
+{
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	COORD pos = { .X = 0, .Y = 0 };
+	DWORD nwc;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+	if(!FillConsoleOutputAttribute(WCLI_G(chnd), info.wAttributes, info.dwSize.X * info.dwSize.Y, pos, &nwc))  RETURN_BOOL(FALSE);
+	if(!FillConsoleOutputCharacter(WCLI_G(chnd), 32, info.dwSize.X * info.dwSize.Y, pos, &nwc)) RETURN_BOOL(FALSE);
+	if(!SetConsoleCursorPosition(WCLI_G(chnd), pos)) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(TRUE);
+}
+
+
 
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************

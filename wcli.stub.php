@@ -307,8 +307,6 @@ function wcli_move_cursor(int $x, int $y): bool {}
 function wcli_echo(string $str, int $fore = null, int $back = null): bool {}
 
 
-
-
 /**
  * Print string with colors at the x-y position without changing cursor position.
  *
@@ -321,3 +319,11 @@ function wcli_echo(string $str, int $fore = null, int $back = null): bool {}
  * @return bool True if success, else false.
  */
 function wcli_print(string $str, int $x = null, int $y = null, int $fore = null, int $back = null): bool {}
+
+
+/**
+ * Clear the console.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_clear(): bool {}
