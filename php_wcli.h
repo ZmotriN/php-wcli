@@ -39,6 +39,7 @@ static BOOL get_parent_proc(PROCESSENTRY32 *parent);
 static DWORD get_parent_pid();
 static HWND get_proc_window(DWORD pid);
 static unsigned char get_key();
+static unsigned char get_key_async();
 
 
 #endif	/* PHP_WCLI_H */

@@ -332,6 +332,14 @@ function wcli_clear(): bool {}
 /**
  * Pause process and wait for a keyboard input.
  *
- * @return int The input character.
+ * @return int|bool The input character otherwise false.
  */
-function wcli_get_key(): int {}
+function wcli_get_key(): int|bool {}
+
+
+/**
+ * Get an async keyboard input.
+ *
+ * @return int|bool The input character otherwise false.
+ */
+function wcli_get_key_async(): int|bool {}

@@ -663,13 +663,31 @@ ZEND_FUNCTION(wcli_clear)
 // ********************************************************************
 
 
-PHP_FUNCTION(wcli_get_key)
+ZEND_FUNCTION(wcli_get_key)
 {
+	unsigned char c;
+
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	c = get_key();
+	if(c == 0) RETURN_BOOL(FALSE);
 
-	RETURN_LONG(get_key());
+	RETURN_LONG(c);
+}
+
+
+ZEND_FUNCTION(wcli_get_key_async)
+{
+	unsigned char c;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	c = get_key_async();
+	if(c == 0) RETURN_BOOL(FALSE);
+	
+	RETURN_LONG(c);
 }
 
 
@@ -821,5 +839,26 @@ static unsigned char get_key()
 		}
 		Sleep(1);
 	}
+	return 0;
+}
+
+
+// Get Key Async
+static unsigned char get_key_async()
+{
+	unsigned int i;
+	HWND whnd;
+
+	whnd = get_console_window_handle();
+	if(whnd != GetForegroundWindow()) return 0;
+
+	if(GetAsyncKeyState(VK_LBUTTON) & 0x8000) return VK_LBUTTON;
+	for(i=1; i <= 256; i++) {
+		if(GetAsyncKeyState(i) & 0x7FFF){
+			FlushConsoleInputBuffer(WCLI_G(ihnd));
+			return i;
+		}
+	}
+
 	return 0;
 }
