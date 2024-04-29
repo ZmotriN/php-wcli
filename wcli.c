@@ -152,6 +152,35 @@ ZEND_FUNCTION(wcli_get_window_handle)
 // ********************************************************************
 
 
+ZEND_FUNCTION(wcli_get_console_title)
+{
+	char title[512];
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleTitleA(title, 512)) RETURN_BOOL(FALSE);
+
+	RETURN_STRING(title);
+}
+
+
+ZEND_FUNCTION(wcli_set_console_title)
+{
+	char *title;
+	size_t size;
+
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_STRING(title, size)
+	ZEND_PARSE_PARAMETERS_END();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!SetConsoleTitle(title)) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(TRUE);
+}
+
+
 ZEND_FUNCTION(wcli_get_console_size)
 {
 	HWND whnd;

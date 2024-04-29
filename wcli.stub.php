@@ -76,6 +76,24 @@ function wcli_get_window_handle(): int|bool {}
 
 
 /**
+ * Return the console title.
+ *
+ * @return string|bool The console title, otherwise false.
+ */
+function wcli_get_console_title(): string|bool {}
+
+
+/**
+ * Set the console title.
+ *
+ * @param string $title The console title
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_set_console_title(string $title): bool {}
+
+
+/**
  * Retrieve the size and the scrolling in characters of the console.
  * Return an array [w, h, x, y]
  *
