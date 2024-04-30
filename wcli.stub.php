@@ -420,3 +420,11 @@ function wcli_get_window_area(): array|bool {}
  * @return array|bool The console window inner area array, otherwise false.
  */
 function wcli_get_client_area(): array|bool {}
+
+
+/**
+ * Minimize console window.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_minimize(): bool {}

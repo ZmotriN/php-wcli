@@ -31,15 +31,4 @@ ZEND_EXTERN_MODULE_GLOBALS(wcli)
 ZEND_TSRMLS_CACHE_EXTERN()
 # endif
 
-
-static void flush_input_buffer();
-static HWND get_console_window_handle();
-static BOOL is_cmd_call();
-static BOOL get_parent_proc(PROCESSENTRY32 *parent);
-static DWORD get_parent_pid();
-static HWND get_proc_window(DWORD pid);
-static unsigned char get_key();
-static unsigned char get_key_async();
-
-
 #endif	/* PHP_WCLI_H */

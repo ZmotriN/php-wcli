@@ -24,6 +24,14 @@ ZEND_DECLARE_MODULE_GLOBALS(wcli)
 
 static void php_wcli_init_globals(zend_wcli_globals *wcli_globals) {}
 
+static void flush_input_buffer();
+static HWND get_console_window_handle();
+static BOOL is_cmd_call();
+static BOOL get_parent_proc(PROCESSENTRY32 *parent);
+static DWORD get_parent_pid();
+static HWND get_proc_window(DWORD pid);
+static unsigned char get_key();
+static unsigned char get_key_async();
 
 PHP_RINIT_FUNCTION(wcli)
 {
@@ -237,8 +245,8 @@ ZEND_FUNCTION(wcli_set_console_size)
 
 	size.Top = 0;
 	size.Left = 0;
-	size.Right = w-1;
-	size.Bottom = h-1;
+	size.Right = w - 1;
+	size.Bottom = h - 1;
 	if(!SetConsoleWindowInfo(WCLI_G(chnd), TRUE, &size)) RETURN_BOOL(FALSE);
 
 	bsize.X = w;
@@ -856,6 +864,24 @@ ZEND_FUNCTION(wcli_get_client_area)
 	add_index_long(return_value, 1, pos.y);
 	add_index_long(return_value, 2, area.right - area.left);
 	add_index_long(return_value, 3, area.bottom - area.top);
+}
+
+
+ZEND_FUNCTION(wcli_minimize)
+{
+	HWND whnd;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	whnd = get_console_window_handle();
+
+	if(!whnd) RETURN_BOOL(FALSE);
+	if(!IsWindowVisible(whnd)) RETURN_BOOL(FALSE);
+	if(IsIconic(whnd)) RETURN_BOOL(TRUE);
+	if(!ShowWindow(whnd, SW_MINIMIZE)) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(TRUE);
 }
 
 
