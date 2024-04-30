@@ -455,10 +455,18 @@ function wcli_activate(): bool {}
 
 
 /**
- * Flash console window
+ * Flash console window.
  *
  * @param bool $invert If TRUE, the window is flashed from one state to the other.
  *
  * @return bool True if success, else false.
  */
 function wcli_flash(bool $invert = false): bool {}
+
+
+/**
+ * Bring console window to front.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_bring_to_front(): bool {}

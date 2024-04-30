@@ -952,6 +952,25 @@ ZEND_FUNCTION(wcli_flash)
 }
 
 
+ZEND_FUNCTION(wcli_bring_to_front)
+{
+	HWND whnd;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	whnd = get_console_window_handle();
+	
+	if(!whnd) RETURN_BOOL(FALSE);
+	if(!IsWindowVisible(whnd)) RETURN_BOOL(FALSE);
+	if(IsIconic(whnd) && !ShowWindow(whnd, SW_RESTORE)) RETURN_BOOL(FALSE);
+	if(!SetWindowPos(whnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW)) RETURN_BOOL(FALSE);
+	if(!SetWindowPos(whnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW)) RETURN_BOOL(FALSE);
+	
+	RETURN_BOOL(BringWindowToTop(whnd));
+}
+
+
 
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************
