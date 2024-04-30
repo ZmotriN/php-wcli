@@ -686,6 +686,49 @@ ZEND_FUNCTION(wcli_clear)
 }
 
 
+ZEND_FUNCTION(wcli_fill)
+{
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	zend_long c, x, y, w, h, fore, back;
+	zend_bool fore_isnull = 1, back_isnull = 1;
+	WORD color;
+	DWORD nwc;
+	COORD pos;
+	int i;
+
+	ZEND_PARSE_PARAMETERS_START(5, 7)
+		Z_PARAM_LONG(c)
+		Z_PARAM_LONG(x)
+		Z_PARAM_LONG(y)
+		Z_PARAM_LONG(w)
+		Z_PARAM_LONG(h)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_LONG_OR_NULL(fore, fore_isnull)
+		Z_PARAM_LONG_OR_NULL(back, back_isnull)
+	ZEND_PARSE_PARAMETERS_END();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
+
+	if(fore_isnull) fore = info.wAttributes & 0xF;
+	if(back_isnull) back = info.wAttributes >> 4;
+
+	if(c < 32 || c > 255) c = 35;
+	if(x < 0 || y < 0 || w < 0 || h < 0) RETURN_BOOL(FALSE);
+	if((x+w) > info.dwSize.X) w = info.dwSize.X - x;
+
+	pos.X = x;
+	color = (back << 4) | fore;
+
+	for(i = 0; i < h && (i + y < info.dwSize.Y); i++) {
+		pos.Y = y + i;
+		if(!FillConsoleOutputAttribute(WCLI_G(chnd), color, w, pos, &nwc)) RETURN_BOOL(FALSE);
+		if(!FillConsoleOutputCharacter(WCLI_G(chnd), c, w, pos, &nwc)) RETURN_BOOL(FALSE);
+	}
+	RETURN_BOOL(TRUE);
+}
+
+
 
 // ********************************************************************
 // ************************* INPUT FUNCTIONS **************************

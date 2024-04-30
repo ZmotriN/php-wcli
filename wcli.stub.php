@@ -348,6 +348,22 @@ function wcli_clear(): bool {}
 
 
 /**
+ * Method fill rect with character and colors.
+ *
+ * @param int $c Character to fill
+ * @param int $x X position of the rect
+ * @param int $y Y position of the rect
+ * @param int $w Width of the rect
+ * @param int $h Height of the rect
+ * @param int $fore Foreground color constant
+ * @param int $back Background color constant
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_fill(int $c, int $x, int $y, int $w, int $h, int $fore = null, int $back = null): bool {}
+
+
+/**
  * Pause process and wait for a keyboard input.
  *
  * @return int|bool The input character otherwise false.

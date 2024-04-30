@@ -140,6 +140,18 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_clear, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_fill, 0, 5, _IS_BOOL, 0)
+	
+	ZEND_ARG_TYPE_INFO(0, c, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, x, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, y, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, w, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, h, IS_LONG, 0)
+	
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, fore, IS_LONG, 1, "null")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, back, IS_LONG, 1, "null")
+ZEND_END_ARG_INFO()
+
 
 // ********************************************************************
 // ************************* INPUT FUNCTIONS **************************
@@ -191,6 +203,7 @@ ZEND_FUNCTION(wcli_move_cursor);
 ZEND_FUNCTION(wcli_echo);
 ZEND_FUNCTION(wcli_print);
 ZEND_FUNCTION(wcli_clear);
+ZEND_FUNCTION(wcli_fill);
 
 ZEND_FUNCTION(wcli_get_key);
 ZEND_FUNCTION(wcli_get_key_async);
@@ -239,6 +252,7 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(wcli_echo, arginfo_wcli_echo)
 	ZEND_FE(wcli_print, arginfo_wcli_print)
 	ZEND_FE(wcli_clear, arginfo_wcli_clear)
+	ZEND_FE(wcli_fill, arginfo_wcli_fill)
 
 	ZEND_FE(wcli_get_key, arginfo_wcli_get_key)
 	ZEND_FE(wcli_get_key_async, arginfo_wcli_get_key_async)
