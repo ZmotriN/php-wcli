@@ -1034,11 +1034,20 @@ ZEND_FUNCTION(wcli_get_parent_pid)
 
 	pid = get_parent_pid();
 	if(pid == 0) RETURN_BOOL(FALSE);
-	
+
 	RETURN_LONG(pid);
 }
 
 
+ZEND_FUNCTION(wcli_is_cmd_call)
+{
+	ZEND_PARSE_PARAMETERS_NONE();
+	
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(!is_cmd_call()) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(TRUE);
+}
 
 
 

@@ -506,3 +506,11 @@ function wcli_get_module_path(): string {}
  * @return int|bool Parent process ID, otherwise false.
  */
 function wcli_get_parent_pid(): int|bool {}
+
+
+/**
+ * Know if the process was lunch by a terminal.
+ *
+ * @return bool True if yes, otherwise false.
+ */
+function wcli_is_cmd_call(): bool {}

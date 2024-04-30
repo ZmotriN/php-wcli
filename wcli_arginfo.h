@@ -219,6 +219,9 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_wcli_get_parent_pid, 0, 0, MAY_BE_BOOL|MAY_BE_LONG)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_is_cmd_call, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
 
 // ********************************************************************
 // *************************** DECLARATIONS ***************************
@@ -280,6 +283,7 @@ ZEND_FUNCTION(wcli_set_position);
 
 ZEND_FUNCTION(wcli_get_module_path);
 ZEND_FUNCTION(wcli_get_parent_pid);
+ZEND_FUNCTION(wcli_is_cmd_call);
 
 
 
@@ -345,6 +349,7 @@ static const zend_function_entry ext_functions[] = {
 
 	ZEND_FE(wcli_get_module_path, arginfo_wcli_get_module_path)
 	ZEND_FE(wcli_get_parent_pid, arginfo_wcli_get_parent_pid)
+	ZEND_FE(wcli_is_cmd_call, arginfo_wcli_is_cmd_call)
 
 	
 	
