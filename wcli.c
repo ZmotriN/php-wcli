@@ -812,6 +812,27 @@ ZEND_FUNCTION(wcli_is_visible)
 }
 
 
+ZEND_FUNCTION(wcli_get_window_area)
+{
+	HWND whnd;
+	RECT area;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	whnd = get_console_window_handle();
+	
+	if(!whnd) RETURN_BOOL(FALSE);
+	if(!GetWindowRect(whnd, &area)) RETURN_BOOL(FALSE);
+
+	array_init(return_value);
+	add_index_long(return_value, 0, area.left);
+	add_index_long(return_value, 1, area.top);
+	add_index_long(return_value, 2, area.right-area.left);
+	add_index_long(return_value, 3, area.bottom-area.top);
+}
+
+
 
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************

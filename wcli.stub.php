@@ -402,3 +402,12 @@ function wcli_is_on_top(): bool {}
  * @return bool True if window is visible, otherwise false.
  */
 function wcli_is_visible(): bool {}
+
+
+/**
+ * Retrieve console window area.
+ * Return an array [x, y, width, height]
+ *
+ * @return array|bool The window console area array, otherwise false.
+ */
+function wcli_get_window_area(): array|bool {}
