@@ -190,10 +190,17 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_restore, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_activate, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
 
 
 
 
+
+
+// ********************************************************************
+// *************************** DECLARATIONS ***************************
+// ********************************************************************
 
 ZEND_FUNCTION(wcli_get_output_handle);
 ZEND_FUNCTION(wcli_get_input_handle);
@@ -243,14 +250,16 @@ ZEND_FUNCTION(wcli_get_client_area);
 ZEND_FUNCTION(wcli_minimize);
 ZEND_FUNCTION(wcli_maximize);
 ZEND_FUNCTION(wcli_restore);
+ZEND_FUNCTION(wcli_activate);
 
 
 
 
 
 
-
-
+// ********************************************************************
+// *************************** ENTRY POINTS ***************************
+// ********************************************************************
 
 static const zend_function_entry ext_functions[] = {
 	ZEND_FE(wcli_get_output_handle, arginfo_wcli_get_output_handle)
@@ -301,6 +310,7 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(wcli_minimize, arginfo_wcli_minimize)
 	ZEND_FE(wcli_maximize, arginfo_wcli_maximize)
 	ZEND_FE(wcli_restore, arginfo_wcli_restore)
+	ZEND_FE(wcli_activate, arginfo_wcli_activate)
 
 	
 	

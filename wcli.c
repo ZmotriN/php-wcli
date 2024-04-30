@@ -32,6 +32,7 @@ static DWORD get_parent_pid();
 static HWND get_proc_window(DWORD pid);
 static unsigned char get_key();
 static unsigned char get_key_async();
+static BOOL activate_window(HWND whnd);
 
 PHP_RINIT_FUNCTION(wcli)
 {
@@ -919,6 +920,20 @@ ZEND_FUNCTION(wcli_restore)
 }
 
 
+ZEND_FUNCTION(wcli_activate)
+{
+	HWND whnd;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	whnd = get_console_window_handle();
+	if(!whnd) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(activate_window(whnd));
+}
+
+
 
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************
@@ -1088,4 +1103,17 @@ static unsigned char get_key_async()
 	}
 
 	return 0;
+}
+
+
+// Activate a window
+static BOOL activate_window(HWND whnd)
+{
+	if(!IsWindowVisible(whnd)) return FALSE;
+	if(get_console_window_handle() == GetForegroundWindow()) return TRUE;
+	if(!ShowWindow(whnd, SW_MINIMIZE)) return FALSE;
+	if(!ShowWindow(whnd, SW_RESTORE)) return FALSE;
+	if(!SetWindowPos(whnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE)) return FALSE;
+	if(!BringWindowToTop(whnd)) return FALSE;
+	return TRUE;
 }

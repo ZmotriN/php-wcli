@@ -444,3 +444,11 @@ function wcli_maximize(): bool {}
  * @return bool True if success, else false.
  */
 function wcli_restore(): bool {}
+
+
+/**
+ * Force console window to activate.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_activate(): bool {}
