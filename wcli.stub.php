@@ -158,6 +158,15 @@ function wcli_set_code_page(int $cpID): bool {}
 
 
 /**
+ * Retrieve console font size in pixels.
+ * Return an array [width, height]
+ *
+ * @return array|bool The font size, otherwise false.
+ */
+function wcli_get_font_size(): array|bool {}
+
+
+/**
  * Get the foreground color.
  *
  * @return int Color Constant

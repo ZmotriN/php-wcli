@@ -304,6 +304,21 @@ ZEND_FUNCTION(wcli_set_code_page)
 }
 
 
+ZEND_FUNCTION(wcli_get_font_size)
+{
+	CONSOLE_FONT_INFO info;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(0);
+	GetCurrentConsoleFont(WCLI_G(chnd), FALSE, &info);
+	
+	array_init(return_value);
+	add_index_long(return_value, 0, info.dwFontSize.X);
+	add_index_long(return_value, 1, info.dwFontSize.Y);
+}
+
+
 
 // ********************************************************************
 // ************************* COLORS FUNCTIONS *************************
