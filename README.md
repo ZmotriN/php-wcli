@@ -395,3 +395,162 @@ function wcli_echo(string $str, int $fore = null, int $back = null): bool {}
  */
 function wcli_print(string $str, int $x = null, int $y = null, int $fore = null, int $back = null): bool {}
 ```
+
+### wcli_fill
+```php
+/**
+ * Method fill rect with character and colors.
+ *
+ * @param int $c Character to fill
+ * @param int $x X position of the rect
+ * @param int $y Y position of the rect
+ * @param int $w Width of the rect
+ * @param int $h Height of the rect
+ * @param int $fore Foreground color constant
+ * @param int $back Background color constant
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_fill(int $c, int $x, int $y, int $w, int $h, int $fore = null, int $back = null): bool {}
+```
+
+### wcli_clear
+```php
+/**
+ * Clear the console.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_clear(): bool {}
+```
+
+
+## Input functions
+
+### wcli_get_key
+```php
+/**
+ * Pause process and wait for a keyboard input.
+ *
+ * @return int|bool The input character otherwise false.
+ */
+function wcli_get_key(): int|bool {}
+```
+
+### wcli_get_key_async
+```php
+/**
+ * Get an async keyboard input.
+ *
+ * @return int|bool The input character otherwise false.
+ */
+function wcli_get_key_async(): int|bool {}
+```
+
+
+## Window functions
+
+### wcli_is_on_top
+```php
+/**
+ * Verify if console window is on top.
+ *
+ * @return bool True if window is on top, otherwise false.
+ */
+function wcli_is_on_top(): bool {}
+```
+
+### wcli_is_visible
+```php
+/**
+ * Verify if console window is visible.
+ *
+ * @return bool True if window is visible, otherwise false.
+ */
+function wcli_is_visible(): bool {}
+```
+
+### wcli_get_window_area
+```php
+/**
+ * Retrieve console window area.
+ * Return an array [x, y, width, height]
+ *
+ * @return array|bool The console window area array, otherwise false.
+ */
+function wcli_get_window_area(): array|bool {}
+```
+
+
+### wcli_get_client_area
+```php
+/**
+ * Retrieve console window inner area.
+ * Return an array [x, y, width, height]
+ *
+ * @return array|bool The console window inner area array, otherwise false.
+ */
+function wcli_get_client_area(): array|bool {}
+```
+
+### wcli_minimize
+```php
+/**
+ * Minimize console window.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_minimize(): bool {}
+```
+
+### wcli_maximize
+```php
+/**
+ * Maximize console window.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_maximize(): bool {}
+```
+
+### wcli_restore
+```php
+/**
+ * Restore console window.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_restore(): bool {}
+```
+
+### wcli_activate
+```php
+/**
+ * Force console window to activate.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_activate(): bool {}
+```
+
+### wcli_flash
+```php
+/**
+ * Flash console window.
+ *
+ * @param bool $invert If TRUE, the window is flashed from one state to the other.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_flash(bool $invert = false): bool {}
+```
+
+### wcli_bring_to_front
+```php
+/**
+ * Bring console window to front.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_bring_to_front(): bool {}
+```
