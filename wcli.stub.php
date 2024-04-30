@@ -470,3 +470,14 @@ function wcli_flash(bool $invert = false): bool {}
  * @return bool True if success, else false.
  */
 function wcli_bring_to_front(): bool {}
+
+
+/**
+ * Set console window position.
+ *
+ * @param int $x X position in pixels
+ * @param int $y Y position in pixels
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_set_position(int $x, int $y): bool {}

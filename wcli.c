@@ -971,6 +971,27 @@ ZEND_FUNCTION(wcli_bring_to_front)
 }
 
 
+ZEND_FUNCTION(wcli_set_position)
+{
+	HWND whnd;
+	zend_long x, y;
+
+	ZEND_PARSE_PARAMETERS_START(2, 2)
+		Z_PARAM_LONG(x)
+		Z_PARAM_LONG(y)
+	ZEND_PARSE_PARAMETERS_END();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	whnd = get_console_window_handle();
+
+	if(!whnd) RETURN_BOOL(FALSE);
+	if(!activate_window(whnd)) RETURN_BOOL(FALSE);
+	if(!SetWindowPos(whnd, HWND_TOP, x, y, 0, 0, SWP_NOSIZE)) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(TRUE);
+}
+
+
 
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************

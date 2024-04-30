@@ -200,6 +200,11 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_bring_to_front, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_set_position, 0, 2, _IS_BOOL, 0)
+	ZEND_ARG_TYPE_INFO(0, x, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, y, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
 
 
 
@@ -258,6 +263,7 @@ ZEND_FUNCTION(wcli_restore);
 ZEND_FUNCTION(wcli_activate);
 ZEND_FUNCTION(wcli_flash);
 ZEND_FUNCTION(wcli_bring_to_front);
+ZEND_FUNCTION(wcli_set_position);
 
 
 
@@ -320,6 +326,7 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(wcli_activate, arginfo_wcli_activate)
 	ZEND_FE(wcli_flash, arginfo_wcli_flash)
 	ZEND_FE(wcli_bring_to_front, arginfo_wcli_bring_to_front)
+	ZEND_FE(wcli_set_position, arginfo_wcli_set_position)
 
 	
 	
