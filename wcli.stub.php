@@ -452,3 +452,13 @@ function wcli_restore(): bool {}
  * @return bool True if success, else false.
  */
 function wcli_activate(): bool {}
+
+
+/**
+ * Flash console window
+ *
+ * @param bool $invert If TRUE, the window is flashed from one state to the other.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_flash(bool $invert = false): bool {}

@@ -934,6 +934,24 @@ ZEND_FUNCTION(wcli_activate)
 }
 
 
+ZEND_FUNCTION(wcli_flash)
+{
+	zend_bool invert = FALSE;
+	HWND whnd;
+
+	ZEND_PARSE_PARAMETERS_START(0, 1)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_BOOL(invert)
+	ZEND_PARSE_PARAMETERS_END();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	whnd = get_console_window_handle();
+	if(!whnd) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(FlashWindow(whnd, invert));
+}
+
+
 
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************

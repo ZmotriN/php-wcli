@@ -193,6 +193,10 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_activate, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_flash, 0, 0, _IS_BOOL, 0)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, invert, _IS_BOOL, 1, "false")
+ZEND_END_ARG_INFO()
+
 
 
 
@@ -251,6 +255,7 @@ ZEND_FUNCTION(wcli_minimize);
 ZEND_FUNCTION(wcli_maximize);
 ZEND_FUNCTION(wcli_restore);
 ZEND_FUNCTION(wcli_activate);
+ZEND_FUNCTION(wcli_flash);
 
 
 
@@ -311,6 +316,7 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(wcli_maximize, arginfo_wcli_maximize)
 	ZEND_FE(wcli_restore, arginfo_wcli_restore)
 	ZEND_FE(wcli_activate, arginfo_wcli_activate)
+	ZEND_FE(wcli_flash, arginfo_wcli_flash)
 
 	
 	
