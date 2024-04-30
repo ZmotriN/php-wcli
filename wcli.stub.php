@@ -389,6 +389,14 @@ function wcli_get_key_async(): int|bool {}
 
 
 /**
+ * Flush console input buffer.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_flush_input_buffer(): bool {}
+
+
+/**
  * Verify if console window is on top.
  *
  * @return bool True if window is on top, otherwise false.

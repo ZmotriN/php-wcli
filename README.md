@@ -447,6 +447,15 @@ function wcli_get_key(): int|bool {}
 function wcli_get_key_async(): int|bool {}
 ```
 
+### wcli_flush_input_buffer
+```php
+/**
+ * Flush console input buffer.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_flush_input_buffer(): bool {}
+```
 
 ## Window functions
 

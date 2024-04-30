@@ -787,6 +787,17 @@ ZEND_FUNCTION(wcli_get_key_async)
 }
 
 
+ZEND_FUNCTION(wcli_flush_input_buffer)
+{
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	flush_input_buffer();
+
+	RETURN_BOOL(TRUE);
+}
+
+
 
 // ********************************************************************
 // ************************* WINDOW FUNCTIONS *************************
