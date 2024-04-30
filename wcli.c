@@ -780,6 +780,23 @@ ZEND_FUNCTION(wcli_get_key_async)
 
 
 // ********************************************************************
+// ************************* WINDOW FUNCTIONS *************************
+// ********************************************************************
+
+
+ZEND_FUNCTION(wcli_is_on_top)
+{
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	if(get_console_window_handle() != GetForegroundWindow()) RETURN_BOOL(FALSE);
+	
+	RETURN_BOOL(TRUE);
+}
+
+
+
+// ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************
 // ********************************************************************
 

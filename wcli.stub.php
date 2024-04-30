@@ -386,3 +386,11 @@ function wcli_get_key(): int|bool {}
  * @return int|bool The input character otherwise false.
  */
 function wcli_get_key_async(): int|bool {}
+
+
+/**
+ * Verify is console window is on top.
+ *
+ * @return bool True if window is ontop, otherwhise false.
+ */
+function wcli_is_on_top(): bool {}
