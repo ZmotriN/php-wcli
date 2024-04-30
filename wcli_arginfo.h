@@ -169,10 +169,11 @@ ZEND_END_ARG_INFO()
 // ************************* WINDOW FUNCTIONS *************************
 // ********************************************************************
 
-
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_is_on_top, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_is_visible, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
 
 
 
@@ -219,8 +220,7 @@ ZEND_FUNCTION(wcli_get_key);
 ZEND_FUNCTION(wcli_get_key_async);
 
 ZEND_FUNCTION(wcli_is_on_top);
-
-
+ZEND_FUNCTION(wcli_is_visible);
 
 
 
@@ -270,6 +270,7 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(wcli_get_key_async, arginfo_wcli_get_key_async)
 
 	ZEND_FE(wcli_is_on_top, arginfo_wcli_is_on_top)
+	ZEND_FE(wcli_is_visible, arginfo_wcli_is_visible)
 
 
 

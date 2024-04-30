@@ -389,8 +389,16 @@ function wcli_get_key_async(): int|bool {}
 
 
 /**
- * Verify is console window is on top.
+ * Verify if console window is on top.
  *
- * @return bool True if window is ontop, otherwhise false.
+ * @return bool True if window is on top, otherwise false.
  */
 function wcli_is_on_top(): bool {}
+
+
+/**
+ * Verify if console window is visible.
+ *
+ * @return bool True if window is visible, otherwise false.
+ */
+function wcli_is_visible(): bool {}

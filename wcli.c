@@ -795,6 +795,23 @@ ZEND_FUNCTION(wcli_is_on_top)
 }
 
 
+ZEND_FUNCTION(wcli_is_visible)
+{
+	HWND whnd;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	whnd = get_console_window_handle();
+
+	if(!whnd) RETURN_BOOL(FALSE);
+	if(!IsWindowVisible(whnd)) RETURN_BOOL(FALSE);
+	if(IsIconic(whnd)) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(TRUE);
+}
+
+
 
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************
