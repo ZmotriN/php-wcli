@@ -576,3 +576,17 @@ function wcli_bring_to_front(): bool {}
  */
 function wcli_set_position(int $x, int $y): bool {}
 ```
+
+
+## Misc functions
+
+### wcli_get_module_path
+```php
+/**
+ * Return module/executable full path.
+ * Usefull for SAPI.
+ *
+ * @return string Module full path
+ */
+function wcli_get_module_path(): string {}
+```

@@ -1005,6 +1005,31 @@ ZEND_FUNCTION(wcli_set_position)
 
 
 // ********************************************************************
+// ************************** MISC FUNCTIONS **************************
+// ********************************************************************
+
+
+ZEND_FUNCTION(wcli_get_module_path)
+{
+	unsigned char path[4096];
+	unsigned char *rpath;
+	DWORD pathsize;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	pathsize = GetModuleFileName(NULL, path, 4096);
+	rpath = emalloc(pathsize + 1);
+	memcpy(rpath, path, pathsize);
+	rpath[pathsize] = 0;
+	
+	RETURN_STRING(rpath);
+}
+
+
+
+
+
+// ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************
 // ********************************************************************
 

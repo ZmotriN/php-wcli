@@ -209,6 +209,12 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_set_position, 0, 2, _IS_BOO
 ZEND_END_ARG_INFO()
 
 
+// ********************************************************************
+// ************************** MISC FUNCTIONS **************************
+// ********************************************************************
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_get_module_path, 0, 0, IS_STRING, 0)
+ZEND_END_ARG_INFO()
 
 
 // ********************************************************************
@@ -269,7 +275,7 @@ ZEND_FUNCTION(wcli_flash);
 ZEND_FUNCTION(wcli_bring_to_front);
 ZEND_FUNCTION(wcli_set_position);
 
-
+ZEND_FUNCTION(wcli_get_module_path);
 
 
 
@@ -332,6 +338,8 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(wcli_flash, arginfo_wcli_flash)
 	ZEND_FE(wcli_bring_to_front, arginfo_wcli_bring_to_front)
 	ZEND_FE(wcli_set_position, arginfo_wcli_set_position)
+
+	ZEND_FE(wcli_get_module_path, arginfo_wcli_get_module_path)
 
 	
 	

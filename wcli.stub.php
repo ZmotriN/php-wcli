@@ -489,3 +489,12 @@ function wcli_bring_to_front(): bool {}
  * @return bool True if success, else false.
  */
 function wcli_set_position(int $x, int $y): bool {}
+
+
+/**
+ * Return module/executable full path.
+ * Usefull for SAPI.
+ *
+ * @return string Module full path
+ */
+function wcli_get_module_path(): string {}
