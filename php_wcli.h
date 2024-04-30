@@ -8,7 +8,7 @@
 extern zend_module_entry wcli_module_entry;
 # define phpext_wcli_ptr &wcli_module_entry
 
-# define PHP_WCLI_VERSION "0.1.0"
+# define PHP_WCLI_VERSION "1.0.0"
 
 ZEND_BEGIN_MODULE_GLOBALS(wcli)
     BOOL console;
