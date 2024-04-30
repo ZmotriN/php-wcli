@@ -590,3 +590,13 @@ function wcli_set_position(int $x, int $y): bool {}
  */
 function wcli_get_module_path(): string {}
 ```
+
+### wcli_get_parent_pid
+```php
+/**
+ * Get parent process ID.
+ *
+ * @return int|bool Parent process ID, otherwise false.
+ */
+function wcli_get_parent_pid(): int|bool {}
+```

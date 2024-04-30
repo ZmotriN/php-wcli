@@ -498,3 +498,11 @@ function wcli_set_position(int $x, int $y): bool {}
  * @return string Module full path
  */
 function wcli_get_module_path(): string {}
+
+
+/**
+ * Get parent process ID.
+ *
+ * @return int|bool Parent process ID, otherwise false.
+ */
+function wcli_get_parent_pid(): int|bool {}

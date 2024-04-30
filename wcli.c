@@ -1026,6 +1026,19 @@ ZEND_FUNCTION(wcli_get_module_path)
 }
 
 
+ZEND_FUNCTION(wcli_get_parent_pid)
+{
+	DWORD pid;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	pid = get_parent_pid();
+	if(pid == 0) RETURN_BOOL(FALSE);
+	
+	RETURN_LONG(pid);
+}
+
+
 
 
 
