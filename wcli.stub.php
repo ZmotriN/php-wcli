@@ -408,6 +408,15 @@ function wcli_is_visible(): bool {}
  * Retrieve console window area.
  * Return an array [x, y, width, height]
  *
- * @return array|bool The window console area array, otherwise false.
+ * @return array|bool The console window area array, otherwise false.
  */
 function wcli_get_window_area(): array|bool {}
+
+
+/**
+ * Retrieve console window inner area.
+ * Return an array [x, y, width, height]
+ *
+ * @return array|bool The console window inner area array, otherwise false.
+ */
+function wcli_get_client_area(): array|bool {}
