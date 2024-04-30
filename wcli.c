@@ -902,6 +902,23 @@ ZEND_FUNCTION(wcli_maximize)
 }
 
 
+ZEND_FUNCTION(wcli_restore)
+{
+	HWND whnd;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	whnd = get_console_window_handle();
+	
+	if(!whnd) RETURN_BOOL(FALSE);
+	if(!IsWindowVisible(whnd)) RETURN_BOOL(FALSE);
+	if(!ShowWindow(whnd, SW_RESTORE)) RETURN_BOOL(FALSE);
+
+	RETURN_BOOL(TRUE);
+}
+
+
 
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************

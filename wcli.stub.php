@@ -436,3 +436,11 @@ function wcli_minimize(): bool {}
  * @return bool True if success, else false.
  */
 function wcli_maximize(): bool {}
+
+
+/**
+ * Restore console window.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_restore(): bool {}
