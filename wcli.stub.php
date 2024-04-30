@@ -428,3 +428,11 @@ function wcli_get_client_area(): array|bool {}
  * @return bool True if success, else false.
  */
 function wcli_minimize(): bool {}
+
+
+/**
+ * Maximize console window.
+ *
+ * @return bool True if success, else false.
+ */
+function wcli_maximize(): bool {}

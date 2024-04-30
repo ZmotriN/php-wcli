@@ -885,6 +885,23 @@ ZEND_FUNCTION(wcli_minimize)
 }
 
 
+ZEND_FUNCTION(wcli_maximize)
+{
+	HWND whnd;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+	whnd = get_console_window_handle();
+
+	if(!whnd) RETURN_BOOL(FALSE);
+	if(!IsWindowVisible(whnd)) RETURN_BOOL(FALSE);
+	if(!ShowWindow(whnd, SW_MAXIMIZE)) RETURN_BOOL(FALSE);
+	
+	RETURN_BOOL(TRUE);
+}
+
+
 
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************
@@ -936,8 +953,7 @@ static BOOL is_cmd_call()
 		WCLI_G(cmdcall) = FALSE;
 		WCLI_G(cmdcalli) = TRUE;
 		return FALSE;
-	}
-	else {
+	} else {
 		WCLI_G(cmdcall) = TRUE;
 		WCLI_G(cmdcalli) = TRUE;
 		return TRUE;
@@ -964,7 +980,7 @@ static BOOL get_parent_proc(PROCESSENTRY32 *parent)
 	hsnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if(hsnap == INVALID_HANDLE_VALUE) return FALSE;
 	proc.dwSize = sizeof(PROCESSENTRY32);
-	for(ctn = Process32First(hsnap, &proc); ctn == TRUE; ctn = Process32Next(hsnap, &proc)){
+	for(ctn = Process32First(hsnap, &proc); ctn == TRUE; ctn = Process32Next(hsnap, &proc)) {
 		if(proc.th32ProcessID == pid){
 			break;
 		}
@@ -972,8 +988,8 @@ static BOOL get_parent_proc(PROCESSENTRY32 *parent)
 
 	// Get parent process info
 	parent->dwSize = sizeof(PROCESSENTRY32);
-	for(ctn = Process32First(hsnap, parent); ctn == TRUE; ctn = Process32Next(hsnap, parent)){
-		if(parent->th32ProcessID == proc.th32ParentProcessID){
+	for(ctn = Process32First(hsnap, parent); ctn == TRUE; ctn = Process32Next(hsnap, parent)) {
+		if(parent->th32ProcessID == proc.th32ParentProcessID) {
 			CloseHandle(hsnap);
 			memcpy(&WCLI_G(parent), parent, sizeof(PROCESSENTRY32));
 			return TRUE;
@@ -1000,10 +1016,10 @@ static HWND get_proc_window(DWORD pid)
 	HWND whnd, parent, owner;
 	DWORD wpid;
 
-	for(whnd = FindWindow(NULL, NULL); whnd != NULL; whnd = GetWindow(whnd, GW_HWNDNEXT)){
+	for(whnd = FindWindow(NULL, NULL); whnd != NULL; whnd = GetWindow(whnd, GW_HWNDNEXT)) {
 		parent = GetParent(whnd);
 		GetWindowThreadProcessId(whnd, &wpid);
-		if(wpid == pid && !parent){
+		if(wpid == pid && !parent) {
 			owner = GetWindow(whnd, GW_OWNER);
 			if(!owner && IsWindowVisible(whnd)) return whnd;
 		}
@@ -1047,8 +1063,8 @@ static unsigned char get_key_async()
 	if(whnd != GetForegroundWindow()) return 0;
 
 	if(GetAsyncKeyState(VK_LBUTTON) & 0x8000) return VK_LBUTTON;
-	for(i=1; i <= 256; i++) {
-		if(GetAsyncKeyState(i) & 0x7FFF){
+	for(i = 1; i <= 256; i++) {
+		if(GetAsyncKeyState(i) & 0x7FFF) {
 			FlushConsoleInputBuffer(WCLI_G(ihnd));
 			return i;
 		}

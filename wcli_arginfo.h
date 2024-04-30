@@ -184,6 +184,9 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_minimize, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_wcli_maximize, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
 
 
 
@@ -233,6 +236,9 @@ ZEND_FUNCTION(wcli_is_visible);
 ZEND_FUNCTION(wcli_get_window_area);
 ZEND_FUNCTION(wcli_get_client_area);
 ZEND_FUNCTION(wcli_minimize);
+ZEND_FUNCTION(wcli_maximize);
+
+
 
 
 
@@ -286,6 +292,9 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(wcli_get_window_area, arginfo_wcli_get_window_area)
 	ZEND_FE(wcli_get_client_area, arginfo_wcli_get_client_area)
 	ZEND_FE(wcli_minimize, arginfo_wcli_minimize)
+	ZEND_FE(wcli_maximize, arginfo_wcli_maximize)
+
+	
 	
 	
 
