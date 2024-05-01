@@ -41,6 +41,7 @@
 
 ZEND_DECLARE_MODULE_GLOBALS(wcli)
 
+
 static void php_wcli_init_globals(zend_wcli_globals *wcli_globals) {}
 
 static void flush_input_buffer();
@@ -55,6 +56,9 @@ static BOOL activate_window(HWND whnd);
 
 PHP_RINIT_FUNCTION(wcli)
 {
+#if defined(ZTS) && defined(COMPILE_DL_WCLI)
+	ZEND_TSRMLS_CACHE_UPDATE();
+#endif
 	WCLI_G(chnd) = GetStdHandle(STD_OUTPUT_HANDLE);
 	if(WCLI_G(chnd) != NULL && WCLI_G(chnd) != INVALID_HANDLE_VALUE) WCLI_G(console) = TRUE;
 	else WCLI_G(console) = FALSE;
@@ -69,12 +73,9 @@ PHP_RINIT_FUNCTION(wcli)
 		GetCurrentConsoleFont(WCLI_G(chnd), FALSE, &WCLI_G(font));
 		flush_input_buffer();
 	}
-
-#if defined(ZTS) && defined(COMPILE_DL_WCLI)
-	ZEND_TSRMLS_CACHE_UPDATE();
-#endif
 	return SUCCESS;
 }
+
 
 
 PHP_MINFO_FUNCTION(wcli)
@@ -126,7 +127,11 @@ zend_module_entry wcli_module_entry = {
 	PHP_RSHUTDOWN(wcli),    /* PHP_RSHUTDOWN - Request shutdown */
 	PHP_MINFO(wcli),        /* PHP_MINFO - Module info */
 	PHP_WCLI_VERSION,       /* Version */
-	STANDARD_MODULE_PROPERTIES
+	PHP_MODULE_GLOBALS(wcli),
+	NULL, //PHP_GINIT(wcli),
+	NULL,
+	NULL,
+	STANDARD_MODULE_PROPERTIES_EX
 };
 
 
