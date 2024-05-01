@@ -1121,7 +1121,7 @@ static BOOL is_cmd_call()
 
 	// Determine if CMD call or not
 	if(!get_parent_proc(&proc)) return FALSE;
-	if(_stricmp(proc.szExeFile, (const char *)"cmd.exe")) {
+	if(_stricmp(proc.szExeFile, (const char *)"cmd.exe") && _stricmp(proc.szExeFile, (const char *)"powershell.exe")) {
 		WCLI_G(cmdcall) = FALSE;
 		WCLI_G(cmdcalli) = TRUE;
 		return FALSE;
