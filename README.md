@@ -1,5 +1,9 @@
 # php-wcli
-Windows CLI native support for PHP
+Windows CLI native support for PHP\
+See example folder.
+
+![image](https://github.com/ZmotriN/php-wcli/assets/8278142/e91d98b8-fb5a-4db4-b570-e2660ba83f00)
+
 
 ## Constants
 Color constants can be use in combination with the Bright flag.\
