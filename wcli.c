@@ -820,7 +820,6 @@ ZEND_FUNCTION(wcli_get_key_async)
 			}
 			if(!numberOfEventsRead) RETURN_BOOL(FALSE);
 		} while(buffer.EventType != KEY_EVENT);
-
 	} while(!buffer.Event.KeyEvent.bKeyDown);
 
 	if(numberOfEventsRead < 1) RETURN_BOOL(FALSE);
