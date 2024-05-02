@@ -13,8 +13,6 @@
 
 ## [1.0.1] - 2024-05-02
 
-### Added
-
 ### Changed
 - Change licence to MIT
 - wcli_get_key() use ReadConsoleInputExA instead of GetKeyState
