@@ -968,13 +968,10 @@ ZEND_FUNCTION(wcli_get_key)
 
 	do {
 		do {
-			if(!WCLI_G(ReadConsoleInputExA)(WCLI_G(ihnd), &buffer, 1, &numberOfEventsRead, 0)) {
-				RETURN_BOOL(FALSE);
-			}
+			if(!WCLI_G(ReadConsoleInputExA)(WCLI_G(ihnd), &buffer, 1, &numberOfEventsRead, 0)) RETURN_BOOL(FALSE);
+			if(numberOfEventsRead < 1) RETURN_BOOL(FALSE);
 		} while(buffer.EventType != KEY_EVENT);
 	} while(!buffer.Event.KeyEvent.bKeyDown);
-
-	if(numberOfEventsRead < 1) RETURN_BOOL(FALSE);
 
 	RETURN_LONG(buffer.Event.KeyEvent.wVirtualKeyCode);
 }
@@ -991,15 +988,11 @@ ZEND_FUNCTION(wcli_get_key_async)
 
 	do {
 		do {
-			if(!WCLI_G(ReadConsoleInputExA)(WCLI_G(ihnd), &buffer, 1, &numberOfEventsRead, CONSOLE_READ_NOWAIT)) {
-				RETURN_BOOL(FALSE);
-			}
+			if(!WCLI_G(ReadConsoleInputExA)(WCLI_G(ihnd), &buffer, 1, &numberOfEventsRead, CONSOLE_READ_NOWAIT)) RETURN_BOOL(FALSE);
 			if(!numberOfEventsRead) RETURN_BOOL(FALSE);
 		} while(buffer.EventType != KEY_EVENT);
 	} while(!buffer.Event.KeyEvent.bKeyDown);
 
-	if(numberOfEventsRead < 1) RETURN_BOOL(FALSE);
-	
 	RETURN_LONG(buffer.Event.KeyEvent.wVirtualKeyCode);
 }
 

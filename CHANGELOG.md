@@ -9,6 +9,7 @@
 
 ### Fixed
 - Optimise wcli_get_key & wcli_get_key_async
+- wcli_get_key: check numberOfEventsRead in loop
 
 
 ## [1.0.1] - 2024-05-02
