@@ -6,6 +6,7 @@
 ### Added
  
 ### Changed
+- Change licence to MIT
  
 ### Fixed
 - Detect Powershell console
