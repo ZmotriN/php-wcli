@@ -46,9 +46,9 @@ static BOOL is_cmd_call();
 static BOOL get_parent_proc(PROCESSENTRY32 *parent);
 static DWORD get_parent_pid();
 static HWND get_proc_window(DWORD pid);
-static unsigned char get_key();
-static unsigned char get_key_async();
 static BOOL activate_window(HWND whnd);
+
+
 
 
 PHP_RINIT_FUNCTION(wcli)
@@ -68,6 +68,10 @@ PHP_RINIT_FUNCTION(wcli)
 		GetConsoleScreenBufferInfo(WCLI_G(chnd), &WCLI_G(screen));
 		GetConsoleCursorInfo(WCLI_G(chnd), &WCLI_G(cursor));
 		GetCurrentConsoleFont(WCLI_G(chnd), FALSE, &WCLI_G(font));
+
+		WCLI_G(ReadConsoleInputExA) = (WCLI_READ)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "ReadConsoleInputExA");
+
+
 		flush_input_buffer();
 	}
 	return SUCCESS;
@@ -781,29 +785,52 @@ ZEND_FUNCTION(wcli_fill)
 
 ZEND_FUNCTION(wcli_get_key)
 {
-	unsigned char c;
+	INPUT_RECORD buffer;
+	DWORD numberOfEventsRead;
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
-	c = get_key();
-	if(c == 0) RETURN_BOOL(FALSE);
+	flush_input_buffer();
 
-	RETURN_LONG(c);
+	do {
+		do {
+			if(!WCLI_G(ReadConsoleInputExA)(WCLI_G(ihnd), &buffer, 1, &numberOfEventsRead, 0)) {
+				RETURN_BOOL(FALSE);
+			}
+			if(buffer.EventType == KEY_EVENT) continue;
+		} while(buffer.EventType != KEY_EVENT);
+	} while(!buffer.Event.KeyEvent.bKeyDown);
+
+	if(numberOfEventsRead < 1) RETURN_BOOL(FALSE);
+
+	RETURN_LONG(buffer.Event.KeyEvent.wVirtualKeyCode);
 }
 
 
 ZEND_FUNCTION(wcli_get_key_async)
 {
-	unsigned char c;
+	INPUT_RECORD buffer;
+	DWORD numberOfEventsRead;
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
-	c = get_key_async();
-	if(c == 0) RETURN_BOOL(FALSE);
+
+	do {
+		do {
+			if(!WCLI_G(ReadConsoleInputExA)(WCLI_G(ihnd), &buffer, 1, &numberOfEventsRead, CONSOLE_READ_NOWAIT)) {
+				RETURN_BOOL(FALSE);
+			}
+			if(!numberOfEventsRead) RETURN_BOOL(FALSE);
+			if(buffer.EventType == KEY_EVENT) continue;
+		} while(buffer.EventType != KEY_EVENT);
+
+	} while(!buffer.Event.KeyEvent.bKeyDown);
+
+	if(numberOfEventsRead < 1) RETURN_BOOL(FALSE);
 	
-	RETURN_LONG(c);
+	RETURN_LONG(buffer.Event.KeyEvent.wVirtualKeyCode);
 }
 
 
@@ -1186,51 +1213,6 @@ static HWND get_proc_window(DWORD pid)
 		if(wpid == pid && !parent) {
 			owner = GetWindow(whnd, GW_OWNER);
 			if(!owner && IsWindowVisible(whnd)) return whnd;
-		}
-	}
-
-	return 0;
-}
-
-
-// Get Keyboard Key
-static unsigned char get_key()
-{
-	unsigned int i;
-	HWND whnd;
-
-	whnd = get_console_window_handle();
-	if(!whnd) return 0;
-
-	for(flush_input_buffer();;) {
-		if(whnd == GetForegroundWindow()) {
-			for(i = 8; i <= 256; i++) {
-				if(GetAsyncKeyState(i) & 0x7FFF) {
-					FlushConsoleInputBuffer(WCLI_G(ihnd));
-					return i;
-				}
-			}
-		}
-		Sleep(1);
-	}
-	return 0;
-}
-
-
-// Get Key Async
-static unsigned char get_key_async()
-{
-	unsigned int i;
-	HWND whnd;
-
-	whnd = get_console_window_handle();
-	if(whnd != GetForegroundWindow()) return 0;
-
-	if(GetAsyncKeyState(VK_LBUTTON) & 0x8000) return VK_LBUTTON;
-	for(i = 1; i <= 256; i++) {
-		if(GetAsyncKeyState(i) & 0x7FFF) {
-			FlushConsoleInputBuffer(WCLI_G(ihnd));
-			return i;
 		}
 	}
 
