@@ -795,7 +795,6 @@ ZEND_FUNCTION(wcli_get_key)
 			if(!WCLI_G(ReadConsoleInputExA)(WCLI_G(ihnd), &buffer, 1, &numberOfEventsRead, 0)) {
 				RETURN_BOOL(FALSE);
 			}
-			if(buffer.EventType == KEY_EVENT) continue;
 		} while(buffer.EventType != KEY_EVENT);
 	} while(!buffer.Event.KeyEvent.bKeyDown);
 
@@ -820,7 +819,6 @@ ZEND_FUNCTION(wcli_get_key_async)
 				RETURN_BOOL(FALSE);
 			}
 			if(!numberOfEventsRead) RETURN_BOOL(FALSE);
-			if(buffer.EventType == KEY_EVENT) continue;
 		} while(buffer.EventType != KEY_EVENT);
 
 	} while(!buffer.Event.KeyEvent.bKeyDown);
