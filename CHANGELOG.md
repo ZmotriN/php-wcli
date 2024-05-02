@@ -3,6 +3,7 @@
 ## [Unreleased] - yyyy-mm-dd
 
 ### Added
+- Virtual Key Codes constants VK_*
 
 ### Changed
 
