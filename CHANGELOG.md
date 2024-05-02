@@ -7,6 +7,7 @@
 ### Changed
  
 ### Fixed
+- Optimise wcli_get_key & wcli_get_key_async
 
 
 ## [1.0.1] - 2024-05-02
