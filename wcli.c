@@ -68,10 +68,7 @@ PHP_RINIT_FUNCTION(wcli)
 		GetConsoleScreenBufferInfo(WCLI_G(chnd), &WCLI_G(screen));
 		GetConsoleCursorInfo(WCLI_G(chnd), &WCLI_G(cursor));
 		GetCurrentConsoleFont(WCLI_G(chnd), FALSE, &WCLI_G(font));
-
 		WCLI_G(ReadConsoleInputExA) = (WCLI_READ)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "ReadConsoleInputExA");
-
-
 		flush_input_buffer();
 	}
 	return SUCCESS;
