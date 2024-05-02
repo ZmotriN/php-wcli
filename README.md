@@ -1,6 +1,5 @@
 # php-wcli
-PHP Extension for Windows CLI native support\
-See example folder.
+PHP Extension for Windows CLI native support.
 
 ![image](https://github.com/ZmotriN/php-wcli/assets/8278142/e91d98b8-fb5a-4db4-b570-e2660ba83f00)
 
