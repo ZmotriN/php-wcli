@@ -24,7 +24,6 @@ class CLIProgressBar
     private $x = 0;
     private $y = 0;
     private $timer = 0;
-    private $progress = 0;
     private $options = [];
 
 
@@ -71,8 +70,6 @@ class CLIProgressBar
 
     public function draw($progress = 0, $done = 0, $text = null)
     {
-        $this->progress = $progress;
-
         if ($progress == 0 || $this->timer == 0) {
             $this->timer = microtime(true);
         }
