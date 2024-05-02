@@ -28,6 +28,7 @@ SOFTWARE.
 #include "ext/standard/info.h"
 #include "php_wcli.h"
 #include "wcli_arginfo.h"
+#include <strsafe.h>
 
 /* For compatibility with older PHP versions */
 #ifndef ZEND_PARSE_PARAMETERS_NONE
@@ -47,7 +48,7 @@ static BOOL get_parent_proc(PROCESSENTRY32 *parent);
 static DWORD get_parent_pid();
 static HWND get_proc_window(DWORD pid);
 static BOOL activate_window(HWND whnd);
-
+static void display_error(LPCTSTR lpszFunction);
 
 
 
@@ -1393,4 +1394,39 @@ static BOOL activate_window(HWND whnd)
 	if(!SetWindowPos(whnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE)) return FALSE;
 	if(!BringWindowToTop(whnd)) return FALSE;
 	return TRUE;
+}
+
+
+// Display the last error. For debuging purpose.
+static void display_error(LPCTSTR lpszFunction)
+{ 
+    // Retrieve the system error message for the last-error code
+
+    LPVOID lpMsgBuf;
+    LPVOID lpDisplayBuf;
+    DWORD dw = GetLastError(); 
+
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &lpMsgBuf,
+        0, NULL );
+
+    // Display the error message and exit the process
+
+    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
+        (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR)); 
+    StringCchPrintf((LPTSTR)lpDisplayBuf, 
+        LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+        TEXT("%s failed with error %d: %s"), 
+        lpszFunction, dw, lpMsgBuf); 
+    // MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK); 
+	printf("%s\r\n", (LPCTSTR)lpDisplayBuf);
+
+    LocalFree(lpMsgBuf);
+    LocalFree(lpDisplayBuf);
 }
