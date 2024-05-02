@@ -9,7 +9,7 @@
 extern zend_module_entry wcli_module_entry;
 # define phpext_wcli_ptr &wcli_module_entry
 
-# define PHP_WCLI_VERSION "1.0.1"
+# define PHP_WCLI_VERSION "1.0.2"
 
 typedef int (__cdecl *WCLI_READ)(
 	_In_ HANDLE hConsoleInput,
