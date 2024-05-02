@@ -8,7 +8,7 @@ $pb1 = new CLIProgressBar(0, 0, ['label' => 'Download 1']);
 $pb2 = new CLIProgressBar(0, 1, ['label' => 'Download 2']);
 
 wcli_set_cursor_position(0, 4);
-wcli_echo("Press ESC to cancel downloads\r\n", Yellow);
+wcli_echo("Press ESC to cancel downloads", Yellow);
 
 for($i = 0; $i <= 100; $i += 0.1, usleep(100000)) {
     $j = $i * 10;
