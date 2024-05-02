@@ -10,6 +10,7 @@
  
 ### Fixed
 - Detect Powershell console
+- Simplify get_console_window_handle()
  
 ## [1.0.0] - 2024-04-30
   

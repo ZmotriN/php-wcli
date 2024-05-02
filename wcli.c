@@ -170,7 +170,7 @@ ZEND_FUNCTION(wcli_get_window_handle)
 	ZEND_PARSE_PARAMETERS_NONE();
 	
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_LONG((zend_long)get_console_window_handle());
 }
 
@@ -1096,13 +1096,9 @@ static HWND get_console_window_handle()
 {
 	DWORD pid;
 
-	// Lazy stuff
 	if(WCLI_G(whnd) != NULL) return WCLI_G(whnd);
+	else WCLI_G(whnd) = GetConsoleWindow();
 
-	// The rest of processssss...
-	if(is_cmd_call()) pid = get_parent_pid();
-	else pid = GetCurrentProcessId();
-	WCLI_G(whnd) = get_proc_window(pid);
 	return WCLI_G(whnd);
 }
 
