@@ -3,9 +3,16 @@
 ## [Unreleased] - yyyy-mm-dd
 
 ### Added
-- Virtual Key Codes constants VK_*
 
 ### Changed
+
+### Fixed
+
+
+## [1.0.2] - 2024-05-03
+
+### Added
+- Virtual Key Codes constants VK_*
 
 ### Fixed
 - Optimise wcli_get_key & wcli_get_key_async

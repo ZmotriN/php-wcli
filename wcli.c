@@ -947,6 +947,7 @@ ZEND_FUNCTION(wcli_fill)
 		if(!FillConsoleOutputAttribute(WCLI_G(chnd), color, w, pos, &nwc)) RETURN_BOOL(FALSE);
 		if(!FillConsoleOutputCharacter(WCLI_G(chnd), c, w, pos, &nwc)) RETURN_BOOL(FALSE);
 	}
+	
 	RETURN_BOOL(TRUE);
 }
 
