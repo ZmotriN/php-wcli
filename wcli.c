@@ -970,7 +970,7 @@ ZEND_FUNCTION(wcli_get_key)
 	do {
 		do {
 			if(!WCLI_G(ReadConsoleInputExA)(WCLI_G(ihnd), &buffer, 1, &numberOfEventsRead, 0)) RETURN_BOOL(FALSE);
-			if(numberOfEventsRead < 1) RETURN_BOOL(FALSE);
+			if(!numberOfEventsRead) RETURN_BOOL(FALSE);
 		} while(buffer.EventType != KEY_EVENT);
 	} while(!buffer.Event.KeyEvent.bKeyDown);
 
