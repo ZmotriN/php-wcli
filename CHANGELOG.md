@@ -5,9 +5,9 @@
 ### Added
 
 ### Changed
-- Optimize wcli_get_key_async()
 
 ### Fixed
+- Optimize wcli_get_key_async()
 
 
 ## [1.0.2] - 2024-05-03
