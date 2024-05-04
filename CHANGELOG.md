@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Optimize wcli_get_key_async()
 
 ### Fixed
 

@@ -947,7 +947,7 @@ ZEND_FUNCTION(wcli_fill)
 		if(!FillConsoleOutputAttribute(WCLI_G(chnd), color, w, pos, &nwc)) RETURN_BOOL(FALSE);
 		if(!FillConsoleOutputCharacter(WCLI_G(chnd), c, w, pos, &nwc)) RETURN_BOOL(FALSE);
 	}
-	
+
 	RETURN_BOOL(TRUE);
 }
 
@@ -983,10 +983,14 @@ ZEND_FUNCTION(wcli_get_key_async)
 {
 	INPUT_RECORD buffer;
 	DWORD numberOfEventsRead;
+	DWORD cNumberOfEvents;
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
+
+	if(!GetNumberOfConsoleInputEvents(WCLI_G(ihnd), &cNumberOfEvents)) RETURN_BOOL(FALSE);
+	if(!cNumberOfEvents) RETURN_BOOL(FALSE);
 
 	do {
 		do {
