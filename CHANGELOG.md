@@ -8,6 +8,7 @@
 
 ### Fixed
 - Optimize wcli_get_key_async()
+- Refactor the input buffer flushing.
 
 
 ## [1.0.2] - 2024-05-03

@@ -41,7 +41,6 @@ ZEND_DECLARE_MODULE_GLOBALS(wcli)
 
 static void php_wcli_init_globals(zend_wcli_globals *wcli_globals) {}
 
-static void flush_input_buffer();
 static HWND get_console_window_handle();
 static BOOL is_cmd_call();
 static BOOL get_parent_proc(PROCESSENTRY32 *parent);
@@ -70,7 +69,7 @@ PHP_RINIT_FUNCTION(wcli)
 		GetConsoleCursorInfo(WCLI_G(chnd), &WCLI_G(cursor));
 		GetCurrentConsoleFont(WCLI_G(chnd), FALSE, &WCLI_G(font));
 		WCLI_G(ReadConsoleInputExA) = (WCLI_READ)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "ReadConsoleInputExA");
-		flush_input_buffer();
+		FlushConsoleInputBuffer(WCLI_G(ihnd));
 	}
 	return SUCCESS;
 }
@@ -283,7 +282,7 @@ PHP_MINIT_FUNCTION(wcli)
 PHP_RSHUTDOWN_FUNCTION(wcli)
 {
 	if(WCLI_G(console)) {
-		flush_input_buffer();
+		FlushConsoleInputBuffer(WCLI_G(ihnd));
 		SetConsoleTextAttribute(WCLI_G(chnd), WCLI_G(screen).wAttributes);
 		SetConsoleCursorInfo(WCLI_G(chnd), &WCLI_G(cursor));
 	}
@@ -966,7 +965,7 @@ ZEND_FUNCTION(wcli_get_key)
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
-	flush_input_buffer();
+	if(!FlushConsoleInputBuffer(WCLI_G(ihnd))) RETURN_BOOL(FALSE);
 
 	do {
 		do {
@@ -1008,7 +1007,7 @@ ZEND_FUNCTION(wcli_flush_input_buffer)
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
-	flush_input_buffer();
+	if(!FlushConsoleInputBuffer(WCLI_G(ihnd))) RETURN_BOOL(FALSE);
 
 	RETURN_BOOL(TRUE);
 }
@@ -1270,21 +1269,6 @@ ZEND_FUNCTION(wcli_is_cmd_call)
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************
 // ********************************************************************
-
-
-// Flush Input Console Buffer
-static void flush_input_buffer()
-{
-	int i, k;
-	for(k = 1; k;) {
-		for(i = 1; i <= 256; i++) {
-			if(k = GetAsyncKeyState(i) & 0x7FFF) {
-				break;
-			}
-		}
-	}
-	FlushConsoleInputBuffer(WCLI_G(ihnd));
-}
 
 
 // Get Current Console Window Handle
