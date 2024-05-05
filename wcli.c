@@ -26,7 +26,6 @@ SOFTWARE.
 
 #include "php.h"
 #include "ext/standard/info.h"
-#include "Zend/zend_constants.h"
 #include "php_wcli.h"
 #include "wcli_arginfo.h"
 #include <strsafe.h>
