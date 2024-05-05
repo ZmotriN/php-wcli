@@ -97,9 +97,9 @@ PHP_MINIT_FUNCTION(wcli)
 	REGISTER_LONG_CONSTANT("Purple", FOREGROUND_RED|FOREGROUND_BLUE, CONST_CS|CONST_PERSISTENT);
 	REGISTER_LONG_CONSTANT("Aqua",   FOREGROUND_GREEN|FOREGROUND_BLUE, CONST_CS|CONST_PERSISTENT);
 	REGISTER_LONG_CONSTANT("White",  FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE, CONST_CS|CONST_PERSISTENT);
-	REGISTER_LONG_CONSTANT("Black",  0x00, CONST_CS|CONST_PERSISTENT);
 	REGISTER_LONG_CONSTANT("Grey",   FOREGROUND_INTENSITY, CONST_CS|CONST_PERSISTENT);
 	REGISTER_LONG_CONSTANT("Bright", FOREGROUND_INTENSITY, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("Black",  0x00, CONST_CS|CONST_PERSISTENT);
 
 
 	// VIRTUAL KEY CODES: https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
@@ -108,7 +108,7 @@ PHP_MINIT_FUNCTION(wcli)
 	if(!constant_exists("VK_CANCEL"))              REGISTER_LONG_CONSTANT("VK_CANCEL",              0x03, CONST_CS|CONST_PERSISTENT); // Control-break processing
 	if(!constant_exists("VK_MBUTTON"))             REGISTER_LONG_CONSTANT("VK_MBUTTON",             0x04, CONST_CS|CONST_PERSISTENT); // Middle mouse button (three-button mouse)
 	if(!constant_exists("VK_XBUTTON1"))            REGISTER_LONG_CONSTANT("VK_XBUTTON1",            0x05, CONST_CS|CONST_PERSISTENT); // X1 mouse button
-	if(!constant_exists("VK_XBUTTON2"))            REGISTER_LONG_CONSTANT("VK_XBUTTON2",            0x06, CONST_CS|CONST_PERSISTENT); // X2 mouse button                   
+	if(!constant_exists("VK_XBUTTON2"))            REGISTER_LONG_CONSTANT("VK_XBUTTON2",            0x06, CONST_CS|CONST_PERSISTENT); // X2 mouse button
 	if(!constant_exists("VK_BACK"))                REGISTER_LONG_CONSTANT("VK_BACK",                0x08, CONST_CS|CONST_PERSISTENT); // BACKSPACE key
 	if(!constant_exists("VK_TAB"))                 REGISTER_LONG_CONSTANT("VK_TAB",                 0x09, CONST_CS|CONST_PERSISTENT); // TAB key
 	if(!constant_exists("VK_CLEAR"))               REGISTER_LONG_CONSTANT("VK_CLEAR",               0x0C, CONST_CS|CONST_PERSISTENT); // CLEAR key
@@ -329,9 +329,9 @@ ZEND_GET_MODULE(wcli)
 ZEND_FUNCTION(wcli_get_output_handle)
 {
 	ZEND_PARSE_PARAMETERS_NONE();
-	
+
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_LONG((zend_long)WCLI_G(chnd));
 }
 
@@ -339,9 +339,9 @@ ZEND_FUNCTION(wcli_get_output_handle)
 ZEND_FUNCTION(wcli_get_input_handle)
 {
 	ZEND_PARSE_PARAMETERS_NONE();
-	
+
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_LONG((zend_long)WCLI_G(ihnd));
 }
 
@@ -349,7 +349,7 @@ ZEND_FUNCTION(wcli_get_input_handle)
 ZEND_FUNCTION(wcli_get_window_handle)
 {
 	ZEND_PARSE_PARAMETERS_NONE();
-	
+
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 
 	RETURN_LONG((zend_long)get_console_window_handle());
@@ -405,7 +405,7 @@ ZEND_FUNCTION(wcli_get_console_size)
 	whnd = get_console_window_handle();
 	sx = GetScrollPos(whnd, SB_HORZ);
 	sy = GetScrollPos(whnd, SB_VERT);
-	
+
 	array_init(return_value);
 	add_index_long(return_value, 0, info.srWindow.Right - info.srWindow.Left + 1);
 	add_index_long(return_value, 1, info.srWindow.Bottom - info.srWindow.Top + 1);
@@ -467,7 +467,7 @@ ZEND_FUNCTION(wcli_get_buffer_size)
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	array_init(return_value);
 	add_index_long(return_value, 0, info.dwSize.X);
 	add_index_long(return_value, 1, info.dwSize.Y);
@@ -485,7 +485,7 @@ ZEND_FUNCTION(wcli_set_buffer_size)
 	ZEND_PARSE_PARAMETERS_END();
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
-	
+
 	bsize.X = w;
 	bsize.Y = h;
 	if(!SetConsoleScreenBufferSize(WCLI_G(chnd), bsize)) RETURN_BOOL(FALSE);
@@ -522,7 +522,7 @@ ZEND_FUNCTION(wcli_get_font_size)
 
 	if(!WCLI_G(console)) RETURN_BOOL(0);
 	GetCurrentConsoleFont(WCLI_G(chnd), FALSE, &info);
-	
+
 	array_init(return_value);
 	add_index_long(return_value, 0, info.dwFontSize.X);
 	add_index_long(return_value, 1, info.dwFontSize.Y);
@@ -543,7 +543,7 @@ ZEND_FUNCTION(wcli_get_foreground_color)
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_LONG(info.wAttributes & 0xF);
 }
 
@@ -552,7 +552,7 @@ ZEND_FUNCTION(wcli_set_foreground_color)
 {
 	CONSOLE_SCREEN_BUFFER_INFO info;
 	zend_long fore;
-	
+
 	ZEND_PARSE_PARAMETERS_START(1, 1)
 		Z_PARAM_LONG(fore)
 	ZEND_PARSE_PARAMETERS_END();
@@ -560,7 +560,7 @@ ZEND_FUNCTION(wcli_set_foreground_color)
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
 	if(!SetConsoleTextAttribute(WCLI_G(chnd), (info.wAttributes & 0xF0) | fore)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_BOOL(true);
 }
 
@@ -573,7 +573,7 @@ ZEND_FUNCTION(wcli_get_background_color)
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_LONG(info.wAttributes >> 4);
 }
 
@@ -586,7 +586,7 @@ ZEND_FUNCTION(wcli_set_background_color)
 	ZEND_PARSE_PARAMETERS_START(1, 1)
 		Z_PARAM_LONG(back)
 	ZEND_PARSE_PARAMETERS_END();
-	
+
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
 	if(!SetConsoleTextAttribute(WCLI_G(chnd), (info.wAttributes & 0x0F) | (back << 4))) RETURN_BOOL(FALSE);
@@ -618,10 +618,10 @@ ZEND_FUNCTION(wcli_set_colors)
 		Z_PARAM_LONG(fore)
 		Z_PARAM_LONG(back)
 	ZEND_PARSE_PARAMETERS_END();
-	
+
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!SetConsoleTextAttribute(WCLI_G(chnd), (back << 4) | fore)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_BOOL(TRUE);
 }
 
@@ -665,10 +665,10 @@ ZEND_FUNCTION(wcli_hide_cursor)
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleCursorInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	info.bVisible = FALSE;
 	if(!SetConsoleCursorInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_BOOL(TRUE);
 }
 
@@ -676,15 +676,15 @@ ZEND_FUNCTION(wcli_hide_cursor)
 ZEND_FUNCTION(wcli_show_cursor)
 {
 	CONSOLE_CURSOR_INFO info;
-	
+
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleCursorInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	info.bVisible = TRUE;
 	if(!SetConsoleCursorInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_BOOL(TRUE);
 }
 
@@ -713,10 +713,10 @@ ZEND_FUNCTION(wcli_set_cursor_visibility)
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleCursorInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	info.bVisible = (BOOL)visible;
 	if(!SetConsoleCursorInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_BOOL(TRUE);
 }
 
@@ -724,12 +724,12 @@ ZEND_FUNCTION(wcli_set_cursor_visibility)
 ZEND_FUNCTION(wcli_get_cursor_size)
 {
 	CONSOLE_CURSOR_INFO info;
-	
+
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleCursorInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_LONG(info.dwSize);
 }
 
@@ -745,12 +745,12 @@ ZEND_FUNCTION(wcli_set_cursor_size)
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleCursorInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	if(size < 1) size = 1;
 	else if(size > 100) size = 100;
 	info.dwSize = size;
 	if(!SetConsoleCursorInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_BOOL(TRUE);
 }
 
@@ -763,7 +763,7 @@ ZEND_FUNCTION(wcli_get_cursor_position)
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	array_init(return_value);
 	add_index_long(return_value, 0, info.dwCursorPosition.X);
 	add_index_long(return_value, 1, info.dwCursorPosition.Y);
@@ -807,7 +807,7 @@ ZEND_FUNCTION(wcli_move_cursor)
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	pos.X = x + info.dwCursorPosition.X;
 	pos.Y = y + info.dwCursorPosition.Y;
 	if(pos.X < 0) pos.X = 0;
@@ -841,17 +841,17 @@ ZEND_FUNCTION(wcli_echo)
 		Z_PARAM_LONG_OR_NULL(fore, fore_isnull)
 		Z_PARAM_LONG_OR_NULL(back, back_isnull)
 	ZEND_PARSE_PARAMETERS_END();
-	
+
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!GetConsoleScreenBufferInfo(WCLI_G(chnd), &info)) RETURN_BOOL(FALSE);
-	
+
 	if(fore_isnull) fore = info.wAttributes & 0xF;
 	if(back_isnull) back = info.wAttributes >> 4;
 
 	if(!SetConsoleTextAttribute(WCLI_G(chnd), (back << 4) | fore)) RETURN_BOOL(FALSE);
 	if(!WriteConsole(WCLI_G(chnd), str, size, &bytes, NULL)) RETURN_BOOL(FALSE);
 	if(!SetConsoleTextAttribute(WCLI_G(chnd), info.wAttributes)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_BOOL(TRUE);
 }
 
@@ -1029,7 +1029,7 @@ ZEND_FUNCTION(wcli_is_on_top)
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(get_console_window_handle() != GetForegroundWindow()) RETURN_BOOL(FALSE);
-	
+
 	RETURN_BOOL(TRUE);
 }
 
@@ -1060,7 +1060,7 @@ ZEND_FUNCTION(wcli_get_window_area)
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	whnd = get_console_window_handle();
-	
+
 	if(!whnd) RETURN_BOOL(FALSE);
 	if(!GetWindowRect(whnd, &area)) RETURN_BOOL(FALSE);
 
@@ -1085,7 +1085,7 @@ ZEND_FUNCTION(wcli_get_client_area)
 
 	if(!whnd) RETURN_BOOL(FALSE);
 	if(!GetClientRect(whnd, &area)) RETURN_BOOL(FALSE);
-	
+
 	pos.x = area.left;
 	pos.y = area.top;
 	if(!ClientToScreen(whnd, &pos)) RETURN_BOOL(FALSE);
@@ -1128,7 +1128,7 @@ ZEND_FUNCTION(wcli_maximize)
 	if(!whnd) RETURN_BOOL(FALSE);
 	if(!IsWindowVisible(whnd)) RETURN_BOOL(FALSE);
 	if(!ShowWindow(whnd, SW_MAXIMIZE)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_BOOL(TRUE);
 }
 
@@ -1141,7 +1141,7 @@ ZEND_FUNCTION(wcli_restore)
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	whnd = get_console_window_handle();
-	
+
 	if(!whnd) RETURN_BOOL(FALSE);
 	if(!IsWindowVisible(whnd)) RETURN_BOOL(FALSE);
 	if(!ShowWindow(whnd, SW_RESTORE)) RETURN_BOOL(FALSE);
@@ -1190,13 +1190,13 @@ ZEND_FUNCTION(wcli_bring_to_front)
 
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	whnd = get_console_window_handle();
-	
+
 	if(!whnd) RETURN_BOOL(FALSE);
 	if(!IsWindowVisible(whnd)) RETURN_BOOL(FALSE);
 	if(IsIconic(whnd) && !ShowWindow(whnd, SW_RESTORE)) RETURN_BOOL(FALSE);
 	if(!SetWindowPos(whnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW)) RETURN_BOOL(FALSE);
 	if(!SetWindowPos(whnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW)) RETURN_BOOL(FALSE);
-	
+
 	RETURN_BOOL(BringWindowToTop(whnd));
 }
 
@@ -1240,7 +1240,7 @@ ZEND_FUNCTION(wcli_get_module_path)
 	rpath = emalloc(pathsize + 1);
 	memcpy(rpath, path, pathsize);
 	rpath[pathsize] = 0;
-	
+
 	RETURN_STRING(rpath);
 }
 
@@ -1261,7 +1261,7 @@ ZEND_FUNCTION(wcli_get_parent_pid)
 ZEND_FUNCTION(wcli_is_cmd_call)
 {
 	ZEND_PARSE_PARAMETERS_NONE();
-	
+
 	if(!WCLI_G(console)) RETURN_BOOL(FALSE);
 	if(!is_cmd_call()) RETURN_BOOL(FALSE);
 
@@ -1289,7 +1289,7 @@ ZEND_FUNCTION(wcli_where)
 
 	if(wcscmp(wext, L"")) wcscpy(realfile, wfile);
 	else swprintf(realfile, MAXPATHLEN, L"%s.exe", wfile);
-		
+
 	ZeroMemory(wbuffer, sizeof(wchar_t) * MAXPATHLEN);
 	if(!SearchPathW(NULL, realfile, NULL, MAXPATHLEN-1, wbuffer, NULL)) RETURN_BOOL(FALSE);
 
@@ -1421,15 +1421,15 @@ static BOOL activate_window(HWND whnd)
 
 // Display the last error. For debuging purpose.
 static void display_error(LPCTSTR lpszFunction)
-{ 
+{
     // Retrieve the system error message for the last-error code
 
     LPVOID lpMsgBuf;
     LPVOID lpDisplayBuf;
-    DWORD dw = GetLastError(); 
+    DWORD dw = GetLastError();
 
     FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
         FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL,
@@ -1440,13 +1440,13 @@ static void display_error(LPCTSTR lpszFunction)
 
     // Display the error message and exit the process
 
-    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
-        (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR)); 
-    StringCchPrintf((LPTSTR)lpDisplayBuf, 
+    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
+        (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR));
+    StringCchPrintf((LPTSTR)lpDisplayBuf,
         LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-        TEXT("%s failed with error %d: %s"), 
-        lpszFunction, dw, lpMsgBuf); 
-    // MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK); 
+        TEXT("%s failed with error %d: %s"),
+        lpszFunction, dw, lpMsgBuf);
+    // MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK);
 	printf("%s\r\n", (LPCTSTR)lpDisplayBuf);
 
     LocalFree(lpMsgBuf);
@@ -1459,16 +1459,16 @@ static wchar_t *Utf82WideChar(const char *str, int len)
 {
 	wchar_t *wstr;
 	int wlen = 0;
-	
+
 	if (!str) return NULL;
 	if (len <= 0) len = strlen(str);
-	
+
 	wlen = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
 	wstr = emalloc(sizeof(TCHAR) * (wlen));
-	
+
 	if (len > 0) MultiByteToWideChar(CP_UTF8, 0, str, len, wstr, wlen);
 	wstr[wlen - 1] = '\0';
-	
+
 	return wstr;
 }
 
@@ -1487,7 +1487,7 @@ static char *WideChar2Utf8(LPCWCH wcs, int *plen)
 	str = emalloc(str_len);
 	int size = WideCharToMultiByte(CP_UTF8, 0, wcs, -1, str, str_len, NULL, NULL);
 	str[str_len - 1] = '\0';
-	
+
 	if (plen) {
 		if (size > 0) size--;
 		*plen = size;
