@@ -657,3 +657,13 @@ function wcli_get_parent_pid(): int|bool {}
  * @return bool True if yes, otherwise false.
  */
 function wcli_is_cmd_call(): bool {}
+
+
+/**
+ * Search filename in environment path.
+ *
+ * @param string $filename Filename to search for.
+ *
+ * @return string|bool The full path of the file, otherwise false.
+ */
+function wcli_where(string $filename): string|bool {}

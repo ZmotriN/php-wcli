@@ -3,6 +3,7 @@
 ## [Unreleased] - yyyy-mm-dd
 
 ### Added
+- wcli_where() to search filename in enviornment path
 
 ### Changed
 

@@ -1,7 +1,10 @@
 /* wcli extension for PHP */
 
 #include "TlHelp32.h"
+#include "shlwapi.h"
 #include <libloaderapi.h>
+	
+#pragma comment(lib, "Shlwapi.lib")
 
 #ifndef PHP_WCLI_H
 # define PHP_WCLI_H

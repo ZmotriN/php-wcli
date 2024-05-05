@@ -48,7 +48,8 @@ static DWORD get_parent_pid();
 static HWND get_proc_window(DWORD pid);
 static BOOL activate_window(HWND whnd);
 static void display_error(LPCTSTR lpszFunction);
-
+static wchar_t *Utf82WideChar(const char *str, int len);
+static char *WideChar2Utf8(LPCWCH wcs, int *plen);
 
 
 PHP_RINIT_FUNCTION(wcli)
@@ -1265,6 +1266,36 @@ ZEND_FUNCTION(wcli_is_cmd_call)
 }
 
 
+ZEND_FUNCTION(wcli_where)
+{
+	char *file;
+	size_t file_size;
+
+	char *buffer;
+	int buffer_size;
+	wchar_t *wext;
+	wchar_t *wfile;
+	wchar_t wbuffer[MAXPATHLEN];
+	wchar_t realfile[MAXPATHLEN];
+
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_STRING(file, file_size)
+	ZEND_PARSE_PARAMETERS_END();
+
+	wfile = Utf82WideChar(file, file_size);
+	wext = PathFindExtensionW(wfile);
+
+	if(wcscmp(wext, L"")) wcscpy(realfile, wfile);
+	else swprintf(realfile, MAXPATHLEN, L"%s.exe", wfile);
+		
+	ZeroMemory(wbuffer, sizeof(wchar_t) * MAXPATHLEN);
+	if(!SearchPathW(NULL, realfile, NULL, MAXPATHLEN-1, wbuffer, NULL)) RETURN_BOOL(FALSE);
+
+	buffer = WideChar2Utf8(wbuffer, &buffer_size);
+	RETURN_STRING(buffer);
+}
+
+
 
 // ********************************************************************
 // *********************** INTERNAL FUNCTIONS *************************
@@ -1418,4 +1449,47 @@ static void display_error(LPCTSTR lpszFunction)
 
     LocalFree(lpMsgBuf);
     LocalFree(lpDisplayBuf);
+}
+
+
+// Convert UTF-8 to WideChar
+static wchar_t *Utf82WideChar(const char *str, int len)
+{
+	wchar_t *wstr;
+	int wlen = 0;
+	
+	if (!str) return NULL;
+	if (len <= 0) len = strlen(str);
+	
+	wlen = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
+	wstr = emalloc(sizeof(TCHAR) * (wlen));
+	
+	if (len > 0) MultiByteToWideChar(CP_UTF8, 0, str, len, wstr, wlen);
+	wstr[wlen - 1] = '\0';
+	
+	return wstr;
+}
+
+
+// Convert WideChar to UTF-8
+static char *WideChar2Utf8(LPCWCH wcs, int *plen)
+{
+	char *str = NULL;
+	int str_len = 0;
+
+	if (!wcs) return NULL;
+
+    str_len = WideCharToMultiByte(CP_UTF8, 0, wcs, -1, NULL, 0, NULL, NULL);
+    if (str_len == 0) return NULL;
+
+	str = emalloc(str_len);
+	int size = WideCharToMultiByte(CP_UTF8, 0, wcs, -1, str, str_len, NULL, NULL);
+	str[str_len - 1] = '\0';
+	
+	if (plen) {
+		if (size > 0) size--;
+		*plen = size;
+	}
+
+	return str;
 }
