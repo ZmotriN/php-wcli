@@ -10,6 +10,7 @@
 ### Fixed
 - Optimize wcli_get_key_async()
 - Refactor the input buffer flushing.
+- Verify if constants exists before defines it
 
 
 ## [1.0.2] - 2024-05-03

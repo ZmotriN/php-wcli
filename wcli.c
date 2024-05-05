@@ -26,9 +26,11 @@ SOFTWARE.
 
 #include "php.h"
 #include "ext/standard/info.h"
+#include "Zend/zend_constants.h"
 #include "php_wcli.h"
 #include "wcli_arginfo.h"
 #include <strsafe.h>
+
 
 /* For compatibility with older PHP versions */
 #ifndef ZEND_PARSE_PARAMETERS_NONE
@@ -50,6 +52,7 @@ static BOOL activate_window(HWND whnd);
 static void display_error(LPCTSTR lpszFunction);
 static wchar_t *Utf82WideChar(const char *str, int len);
 static char *WideChar2Utf8(LPCWCH wcs, int *plen);
+static BOOL constant_exists(char *name);
 
 
 PHP_RINIT_FUNCTION(wcli)
@@ -86,6 +89,11 @@ PHP_MINFO_FUNCTION(wcli)
 
 PHP_MINIT_FUNCTION(wcli)
 {
+	// bool exists;
+	// zend_constant c;
+
+	zval *sid;
+
 	// COLORS
 	REGISTER_LONG_CONSTANT("Red",    FOREGROUND_RED, CONST_CS|CONST_PERSISTENT);
 	REGISTER_LONG_CONSTANT("Green",  FOREGROUND_GREEN, CONST_CS|CONST_PERSISTENT);
@@ -100,179 +108,179 @@ PHP_MINIT_FUNCTION(wcli)
 
 
 	// VIRTUAL KEY CODES: https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
-	REGISTER_LONG_CONSTANT("VK_LBUTTON",             0x01, CONST_CS|CONST_PERSISTENT); // Left mouse button
-	REGISTER_LONG_CONSTANT("VK_RBUTTON",             0x02, CONST_CS|CONST_PERSISTENT); // Right mouse button
-	REGISTER_LONG_CONSTANT("VK_CANCEL",              0x03, CONST_CS|CONST_PERSISTENT); // Control-break processing
-	REGISTER_LONG_CONSTANT("VK_MBUTTON",             0x04, CONST_CS|CONST_PERSISTENT); // Middle mouse button (three-button mouse)
-	REGISTER_LONG_CONSTANT("VK_XBUTTON1",            0x05, CONST_CS|CONST_PERSISTENT); // X1 mouse button
-	REGISTER_LONG_CONSTANT("VK_XBUTTON2",            0x06, CONST_CS|CONST_PERSISTENT); // X2 mouse button                   
-	REGISTER_LONG_CONSTANT("VK_BACK",                0x08, CONST_CS|CONST_PERSISTENT); // BACKSPACE key
-	REGISTER_LONG_CONSTANT("VK_TAB",                 0x09, CONST_CS|CONST_PERSISTENT); // TAB key
-	REGISTER_LONG_CONSTANT("VK_CLEAR",               0x0C, CONST_CS|CONST_PERSISTENT); // CLEAR key
-	REGISTER_LONG_CONSTANT("VK_RETURN",              0x0D, CONST_CS|CONST_PERSISTENT); // ENTER key
-	REGISTER_LONG_CONSTANT("VK_SHIFT",               0x10, CONST_CS|CONST_PERSISTENT); // SHIFT key
-	REGISTER_LONG_CONSTANT("VK_CONTROL",             0x11, CONST_CS|CONST_PERSISTENT); // CTRL key
-	REGISTER_LONG_CONSTANT("VK_MENU",                0x12, CONST_CS|CONST_PERSISTENT); // ALT key
-	REGISTER_LONG_CONSTANT("VK_PAUSE",               0x13, CONST_CS|CONST_PERSISTENT); // PAUSE key
-	REGISTER_LONG_CONSTANT("VK_CAPITAL",             0x14, CONST_CS|CONST_PERSISTENT); // CAPS LOCK key
-	REGISTER_LONG_CONSTANT("VK_KANA",                0x15, CONST_CS|CONST_PERSISTENT); // IME Kana mode
-	REGISTER_LONG_CONSTANT("VK_HANGUEL",             0x15, CONST_CS|CONST_PERSISTENT); // IME Hanguel mode (maintained for compatibility; use VK_HANGUL)
-	REGISTER_LONG_CONSTANT("VK_HANGUL",              0x15, CONST_CS|CONST_PERSISTENT); // IME Hangul mode
-	REGISTER_LONG_CONSTANT("VK_JUNJA",               0x17, CONST_CS|CONST_PERSISTENT); // IME Junja mode
-	REGISTER_LONG_CONSTANT("VK_FINAL",               0x18, CONST_CS|CONST_PERSISTENT); // IME final mode
-	REGISTER_LONG_CONSTANT("VK_HANJA",               0x19, CONST_CS|CONST_PERSISTENT); // IME Hanja mode
-	REGISTER_LONG_CONSTANT("VK_KANJI",               0x19, CONST_CS|CONST_PERSISTENT); // IME Kanji mode
-	REGISTER_LONG_CONSTANT("VK_ESCAPE",              0x1B, CONST_CS|CONST_PERSISTENT); // ESC key
-	REGISTER_LONG_CONSTANT("VK_CONVERT",             0x1C, CONST_CS|CONST_PERSISTENT); // IME convert
-	REGISTER_LONG_CONSTANT("VK_NONCONVERT",          0x1D, CONST_CS|CONST_PERSISTENT); // IME nonconvert
-	REGISTER_LONG_CONSTANT("VK_ACCEPT",              0x1E, CONST_CS|CONST_PERSISTENT); // IME accept
-	REGISTER_LONG_CONSTANT("VK_MODECHANGE",          0x1F, CONST_CS|CONST_PERSISTENT); // IME mode change request
-	REGISTER_LONG_CONSTANT("VK_SPACE",               0x20, CONST_CS|CONST_PERSISTENT); // SPACEBAR
-	REGISTER_LONG_CONSTANT("VK_PRIOR",               0x21, CONST_CS|CONST_PERSISTENT); // PAGE UP key
-	REGISTER_LONG_CONSTANT("VK_NEXT",                0x22, CONST_CS|CONST_PERSISTENT); // PAGE DOWN key
-	REGISTER_LONG_CONSTANT("VK_END",                 0x23, CONST_CS|CONST_PERSISTENT); // END key
-	REGISTER_LONG_CONSTANT("VK_HOME",                0x24, CONST_CS|CONST_PERSISTENT); // HOME key
-	REGISTER_LONG_CONSTANT("VK_LEFT",                0x25, CONST_CS|CONST_PERSISTENT); // LEFT ARROW key
-	REGISTER_LONG_CONSTANT("VK_UP",                  0x26, CONST_CS|CONST_PERSISTENT); // UP ARROW key
-	REGISTER_LONG_CONSTANT("VK_RIGHT",               0x27, CONST_CS|CONST_PERSISTENT); // RIGHT ARROW key
-	REGISTER_LONG_CONSTANT("VK_DOWN",                0x28, CONST_CS|CONST_PERSISTENT); // DOWN ARROW key
-	REGISTER_LONG_CONSTANT("VK_SELECT",              0x29, CONST_CS|CONST_PERSISTENT); // SELECT key
-	REGISTER_LONG_CONSTANT("VK_PRINT",               0x2A, CONST_CS|CONST_PERSISTENT); // PRINT key
-	REGISTER_LONG_CONSTANT("VK_EXECUTE",             0x2B, CONST_CS|CONST_PERSISTENT); // EXECUTE key
-	REGISTER_LONG_CONSTANT("VK_SNAPSHOT",            0x2C, CONST_CS|CONST_PERSISTENT); // PRINT SCREEN key
-	REGISTER_LONG_CONSTANT("VK_INSERT",              0x2D, CONST_CS|CONST_PERSISTENT); // INS key
-	REGISTER_LONG_CONSTANT("VK_DELETE",              0x2E, CONST_CS|CONST_PERSISTENT); // DEL key
-	REGISTER_LONG_CONSTANT("VK_HELP",                0x2F, CONST_CS|CONST_PERSISTENT); // HELP key
-	REGISTER_LONG_CONSTANT("VK_LWIN",                0x5B, CONST_CS|CONST_PERSISTENT); // Left Windows key (Natural keyboard)
-	REGISTER_LONG_CONSTANT("VK_RWIN",                0x5C, CONST_CS|CONST_PERSISTENT); // Right Windows key (Natural keyboard)
-	REGISTER_LONG_CONSTANT("VK_APPS",                0x5D, CONST_CS|CONST_PERSISTENT); // Applications key (Natural keyboard)
-	REGISTER_LONG_CONSTANT("VK_SLEEP",               0x5F, CONST_CS|CONST_PERSISTENT); // Computer Sleep key
-	REGISTER_LONG_CONSTANT("VK_NUMPAD0",             0x60, CONST_CS|CONST_PERSISTENT); // Numeric keypad 0 key
-	REGISTER_LONG_CONSTANT("VK_NUMPAD1",             0x61, CONST_CS|CONST_PERSISTENT); // Numeric keypad 1 key
-	REGISTER_LONG_CONSTANT("VK_NUMPAD2",             0x62, CONST_CS|CONST_PERSISTENT); // Numeric keypad 2 key
-	REGISTER_LONG_CONSTANT("VK_NUMPAD3",             0x63, CONST_CS|CONST_PERSISTENT); // Numeric keypad 3 key
-	REGISTER_LONG_CONSTANT("VK_NUMPAD4",             0x64, CONST_CS|CONST_PERSISTENT); // Numeric keypad 4 key
-	REGISTER_LONG_CONSTANT("VK_NUMPAD5",             0x65, CONST_CS|CONST_PERSISTENT); // Numeric keypad 5 key
-	REGISTER_LONG_CONSTANT("VK_NUMPAD6",             0x66, CONST_CS|CONST_PERSISTENT); // Numeric keypad 6 key
-	REGISTER_LONG_CONSTANT("VK_NUMPAD7",             0x67, CONST_CS|CONST_PERSISTENT); // Numeric keypad 7 key
-	REGISTER_LONG_CONSTANT("VK_NUMPAD8",             0x68, CONST_CS|CONST_PERSISTENT); // Numeric keypad 8 key
-	REGISTER_LONG_CONSTANT("VK_NUMPAD9",             0x69, CONST_CS|CONST_PERSISTENT); // Numeric keypad 9 key
-	REGISTER_LONG_CONSTANT("VK_MULTIPLY",            0x6A, CONST_CS|CONST_PERSISTENT); // Multiply key
-	REGISTER_LONG_CONSTANT("VK_ADD",                 0x6B, CONST_CS|CONST_PERSISTENT); // Add key
-	REGISTER_LONG_CONSTANT("VK_SEPARATOR",           0x6C, CONST_CS|CONST_PERSISTENT); // Separator key
-	REGISTER_LONG_CONSTANT("VK_SUBTRACT",            0x6D, CONST_CS|CONST_PERSISTENT); // Subtract key
-	REGISTER_LONG_CONSTANT("VK_DECIMAL",             0x6E, CONST_CS|CONST_PERSISTENT); // Decimal key
-	REGISTER_LONG_CONSTANT("VK_DIVIDE",              0x6F, CONST_CS|CONST_PERSISTENT); // Divide key
-	REGISTER_LONG_CONSTANT("VK_F1",                  0x70, CONST_CS|CONST_PERSISTENT); // F1 key
-	REGISTER_LONG_CONSTANT("VK_F2",                  0x71, CONST_CS|CONST_PERSISTENT); // F2 key
-	REGISTER_LONG_CONSTANT("VK_F3",                  0x72, CONST_CS|CONST_PERSISTENT); // F3 key
-	REGISTER_LONG_CONSTANT("VK_F4",                  0x73, CONST_CS|CONST_PERSISTENT); // F4 key
-	REGISTER_LONG_CONSTANT("VK_F5",                  0x74, CONST_CS|CONST_PERSISTENT); // F5 key
-	REGISTER_LONG_CONSTANT("VK_F6",                  0x75, CONST_CS|CONST_PERSISTENT); // F6 key
-	REGISTER_LONG_CONSTANT("VK_F7",                  0x76, CONST_CS|CONST_PERSISTENT); // F7 key
-	REGISTER_LONG_CONSTANT("VK_F8",                  0x77, CONST_CS|CONST_PERSISTENT); // F8 key
-	REGISTER_LONG_CONSTANT("VK_F9",                  0x78, CONST_CS|CONST_PERSISTENT); // F9 key
-	REGISTER_LONG_CONSTANT("VK_F10",                 0x79, CONST_CS|CONST_PERSISTENT); // F10 key
-	REGISTER_LONG_CONSTANT("VK_F11",                 0x7A, CONST_CS|CONST_PERSISTENT); // F11 key
-	REGISTER_LONG_CONSTANT("VK_F12",                 0x7B, CONST_CS|CONST_PERSISTENT); // F12 key
-	REGISTER_LONG_CONSTANT("VK_F13",                 0x7C, CONST_CS|CONST_PERSISTENT); // F13 key
-	REGISTER_LONG_CONSTANT("VK_F14",                 0x7D, CONST_CS|CONST_PERSISTENT); // F14 key
-	REGISTER_LONG_CONSTANT("VK_F15",                 0x7E, CONST_CS|CONST_PERSISTENT); // F15 key
-	REGISTER_LONG_CONSTANT("VK_F16",                 0x7F, CONST_CS|CONST_PERSISTENT); // F16 key
-	REGISTER_LONG_CONSTANT("VK_F17",                 0x80, CONST_CS|CONST_PERSISTENT); // F17 key
-	REGISTER_LONG_CONSTANT("VK_F18",                 0x81, CONST_CS|CONST_PERSISTENT); // F18 key
-	REGISTER_LONG_CONSTANT("VK_F19",                 0x82, CONST_CS|CONST_PERSISTENT); // F19 key
-	REGISTER_LONG_CONSTANT("VK_F20",                 0x83, CONST_CS|CONST_PERSISTENT); // F20 key
-	REGISTER_LONG_CONSTANT("VK_F21",                 0x84, CONST_CS|CONST_PERSISTENT); // F21 key
-	REGISTER_LONG_CONSTANT("VK_F22",                 0x85, CONST_CS|CONST_PERSISTENT); // F22 key
-	REGISTER_LONG_CONSTANT("VK_F23",                 0x86, CONST_CS|CONST_PERSISTENT); // F23 key
-	REGISTER_LONG_CONSTANT("VK_F24",                 0x87, CONST_CS|CONST_PERSISTENT); // F24 key
-	REGISTER_LONG_CONSTANT("VK_NUMLOCK",             0x90, CONST_CS|CONST_PERSISTENT); // NUM LOCK key
-	REGISTER_LONG_CONSTANT("VK_SCROLL",              0x91, CONST_CS|CONST_PERSISTENT); // SCROLL LOCK key
-	REGISTER_LONG_CONSTANT("VK_LSHIFT",              0xA0, CONST_CS|CONST_PERSISTENT); // Left SHIFT key
-	REGISTER_LONG_CONSTANT("VK_RSHIFT",              0xA1, CONST_CS|CONST_PERSISTENT); // Right SHIFT key
-	REGISTER_LONG_CONSTANT("VK_LCONTROL",            0xA2, CONST_CS|CONST_PERSISTENT); // Left CONTROL key
-	REGISTER_LONG_CONSTANT("VK_RCONTROL",            0xA3, CONST_CS|CONST_PERSISTENT); // Right CONTROL key
-	REGISTER_LONG_CONSTANT("VK_LMENU",               0xA4, CONST_CS|CONST_PERSISTENT); // Left MENU key
-	REGISTER_LONG_CONSTANT("VK_RMENU",               0xA5, CONST_CS|CONST_PERSISTENT); // Right MENU key
-	REGISTER_LONG_CONSTANT("VK_BROWSER_BACK",        0xA6, CONST_CS|CONST_PERSISTENT); // Browser Back key
-	REGISTER_LONG_CONSTANT("VK_BROWSER_FORWARD",     0xA7, CONST_CS|CONST_PERSISTENT); // Browser Forward key
-	REGISTER_LONG_CONSTANT("VK_BROWSER_REFRESH",     0xA8, CONST_CS|CONST_PERSISTENT); // Browser Refresh key
-	REGISTER_LONG_CONSTANT("VK_BROWSER_STOP",        0xA9, CONST_CS|CONST_PERSISTENT); // Browser Stop key
-	REGISTER_LONG_CONSTANT("VK_BROWSER_SEARCH",      0xAA, CONST_CS|CONST_PERSISTENT); // Browser Search key
-	REGISTER_LONG_CONSTANT("VK_BROWSER_FAVORITES",   0xAB, CONST_CS|CONST_PERSISTENT); // Browser Favorites key
-	REGISTER_LONG_CONSTANT("VK_BROWSER_HOME",        0xAC, CONST_CS|CONST_PERSISTENT); // Browser Start and Home key
-	REGISTER_LONG_CONSTANT("VK_VOLUME_MUTE",         0xAD, CONST_CS|CONST_PERSISTENT); // Volume Mute key
-	REGISTER_LONG_CONSTANT("VK_VOLUME_DOWN",         0xAE, CONST_CS|CONST_PERSISTENT); // Volume Down key
-	REGISTER_LONG_CONSTANT("VK_VOLUME_UP",           0xAF, CONST_CS|CONST_PERSISTENT); // Volume Up key
-	REGISTER_LONG_CONSTANT("VK_MEDIA_NEXT_TRACK",    0xB0, CONST_CS|CONST_PERSISTENT); // Next Track key
-	REGISTER_LONG_CONSTANT("VK_MEDIA_PREV_TRACK",    0xB1, CONST_CS|CONST_PERSISTENT); // Previous Track key
-	REGISTER_LONG_CONSTANT("VK_MEDIA_STOP",          0xB2, CONST_CS|CONST_PERSISTENT); // Stop Media key
-	REGISTER_LONG_CONSTANT("VK_MEDIA_PLAY_PAUSE",    0xB3, CONST_CS|CONST_PERSISTENT); // Play/Pause Media key
-	REGISTER_LONG_CONSTANT("VK_LAUNCH_MAIL",         0xB4, CONST_CS|CONST_PERSISTENT); // Start Mail key
-	REGISTER_LONG_CONSTANT("VK_LAUNCH_MEDIA_SELECT", 0xB5, CONST_CS|CONST_PERSISTENT); // Select Media key
-	REGISTER_LONG_CONSTANT("VK_LAUNCH_APP1",         0xB6, CONST_CS|CONST_PERSISTENT); // Start Application 1 key
-	REGISTER_LONG_CONSTANT("VK_LAUNCH_APP2",         0xB7, CONST_CS|CONST_PERSISTENT); // Start Application 2 key
-	REGISTER_LONG_CONSTANT("VK_OEM_1",               0xBA, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the ';:' key
-	REGISTER_LONG_CONSTANT("VK_OEM_PLUS",            0xBB, CONST_CS|CONST_PERSISTENT); // For any country/region, the '+' key
-	REGISTER_LONG_CONSTANT("VK_OEM_COMMA",           0xBC, CONST_CS|CONST_PERSISTENT); // For any country/region, the ',' key
-	REGISTER_LONG_CONSTANT("VK_OEM_MINUS",           0xBD, CONST_CS|CONST_PERSISTENT); // For any country/region, the '-' key
-	REGISTER_LONG_CONSTANT("VK_OEM_PERIOD",          0xBE, CONST_CS|CONST_PERSISTENT); // For any country/region, the '.' key
-	REGISTER_LONG_CONSTANT("VK_OEM_2",               0xBF, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the '/?' key
-	REGISTER_LONG_CONSTANT("VK_OEM_3",               0xC0, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the '`~' key
-	REGISTER_LONG_CONSTANT("VK_OEM_4",               0xDB, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the '[{' key
-	REGISTER_LONG_CONSTANT("VK_OEM_5",               0xDC, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the '\|' key
-	REGISTER_LONG_CONSTANT("VK_OEM_6",               0xDD, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the ']}' key
-	REGISTER_LONG_CONSTANT("VK_OEM_7",               0xDE, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the 'single-quote/double-quote' key
-	REGISTER_LONG_CONSTANT("VK_OEM_8",               0xDF, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard.
-	REGISTER_LONG_CONSTANT("VK_OEM_102",             0xE2, CONST_CS|CONST_PERSISTENT); // Either the angle bracket key or the backslash key on the RT 102-key keyboard
-	REGISTER_LONG_CONSTANT("VK_PROCESSKEY",          0xE5, CONST_CS|CONST_PERSISTENT); // IME PROCESS key
-	REGISTER_LONG_CONSTANT("VK_PACKET",              0xE7, CONST_CS|CONST_PERSISTENT); // Used to pass Unicode characters as if they were keystrokes. The VK_PACKET key is the low word of a 32-bit Virtual Key value used for non-keyboard input methods. For more information, see Remark in KEYBDINPUT, SendInput, WM_KEYDOWN, and WM_KEYUP
-	REGISTER_LONG_CONSTANT("VK_ATTN",                0xF6, CONST_CS|CONST_PERSISTENT); // Attn key
-	REGISTER_LONG_CONSTANT("VK_CRSEL",               0xF7, CONST_CS|CONST_PERSISTENT); // CrSel key
-	REGISTER_LONG_CONSTANT("VK_EXSEL",               0xF8, CONST_CS|CONST_PERSISTENT); // ExSel key
-	REGISTER_LONG_CONSTANT("VK_EREOF",               0xF9, CONST_CS|CONST_PERSISTENT); // Erase EOF key
-	REGISTER_LONG_CONSTANT("VK_PLAY",                0xFA, CONST_CS|CONST_PERSISTENT); // Play key
-	REGISTER_LONG_CONSTANT("VK_ZOOM",                0xFB, CONST_CS|CONST_PERSISTENT); // Zoom key
-	REGISTER_LONG_CONSTANT("VK_NONAME",              0xFC, CONST_CS|CONST_PERSISTENT); // Reserved
-	REGISTER_LONG_CONSTANT("VK_PA1",                 0xFD, CONST_CS|CONST_PERSISTENT); // PA1 key
-	REGISTER_LONG_CONSTANT("VK_OEM_CLEAR",           0xFE, CONST_CS|CONST_PERSISTENT); // Clear key
-	REGISTER_LONG_CONSTANT("VK_0",                   0x30, CONST_CS|CONST_PERSISTENT); // 0 key
-	REGISTER_LONG_CONSTANT("VK_1",                   0x31, CONST_CS|CONST_PERSISTENT); // 1 key
-	REGISTER_LONG_CONSTANT("VK_2",                   0x32, CONST_CS|CONST_PERSISTENT); // 2 key
-	REGISTER_LONG_CONSTANT("VK_3",                   0x33, CONST_CS|CONST_PERSISTENT); // 3 key
-	REGISTER_LONG_CONSTANT("VK_4",                   0x34, CONST_CS|CONST_PERSISTENT); // 4 key
-	REGISTER_LONG_CONSTANT("VK_5",                   0x35, CONST_CS|CONST_PERSISTENT); // 5 key
-	REGISTER_LONG_CONSTANT("VK_6",                   0x36, CONST_CS|CONST_PERSISTENT); // 6 key
-	REGISTER_LONG_CONSTANT("VK_7",                   0x37, CONST_CS|CONST_PERSISTENT); // 7 key
-	REGISTER_LONG_CONSTANT("VK_8",                   0x38, CONST_CS|CONST_PERSISTENT); // 8 key
-	REGISTER_LONG_CONSTANT("VK_9",                   0x39, CONST_CS|CONST_PERSISTENT); // 9 key
-	REGISTER_LONG_CONSTANT("VK_A",                   0x41, CONST_CS|CONST_PERSISTENT); // A key
-	REGISTER_LONG_CONSTANT("VK_B",                   0x42, CONST_CS|CONST_PERSISTENT); // B key
-	REGISTER_LONG_CONSTANT("VK_C",                   0x43, CONST_CS|CONST_PERSISTENT); // C key
-	REGISTER_LONG_CONSTANT("VK_D",                   0x44, CONST_CS|CONST_PERSISTENT); // D key
-	REGISTER_LONG_CONSTANT("VK_E",                   0x45, CONST_CS|CONST_PERSISTENT); // E key
-	REGISTER_LONG_CONSTANT("VK_F",                   0x46, CONST_CS|CONST_PERSISTENT); // F key
-	REGISTER_LONG_CONSTANT("VK_G",                   0x47, CONST_CS|CONST_PERSISTENT); // G key
-	REGISTER_LONG_CONSTANT("VK_H",                   0x48, CONST_CS|CONST_PERSISTENT); // H key
-	REGISTER_LONG_CONSTANT("VK_I",                   0x49, CONST_CS|CONST_PERSISTENT); // I key
-	REGISTER_LONG_CONSTANT("VK_J",                   0x4A, CONST_CS|CONST_PERSISTENT); // J key
-	REGISTER_LONG_CONSTANT("VK_K",                   0x4B, CONST_CS|CONST_PERSISTENT); // K key
-	REGISTER_LONG_CONSTANT("VK_L",                   0x4C, CONST_CS|CONST_PERSISTENT); // L key
-	REGISTER_LONG_CONSTANT("VK_M",                   0x4D, CONST_CS|CONST_PERSISTENT); // M key
-	REGISTER_LONG_CONSTANT("VK_N",                   0x4E, CONST_CS|CONST_PERSISTENT); // N key
-	REGISTER_LONG_CONSTANT("VK_O",                   0x4F, CONST_CS|CONST_PERSISTENT); // O key
-	REGISTER_LONG_CONSTANT("VK_P",                   0x50, CONST_CS|CONST_PERSISTENT); // P key
-	REGISTER_LONG_CONSTANT("VK_Q",                   0x51, CONST_CS|CONST_PERSISTENT); // Q key
-	REGISTER_LONG_CONSTANT("VK_R",                   0x52, CONST_CS|CONST_PERSISTENT); // R key
-	REGISTER_LONG_CONSTANT("VK_S",                   0x53, CONST_CS|CONST_PERSISTENT); // S key
-	REGISTER_LONG_CONSTANT("VK_T",                   0x54, CONST_CS|CONST_PERSISTENT); // T key
-	REGISTER_LONG_CONSTANT("VK_U",                   0x55, CONST_CS|CONST_PERSISTENT); // U key
-	REGISTER_LONG_CONSTANT("VK_V",                   0x56, CONST_CS|CONST_PERSISTENT); // V key
-	REGISTER_LONG_CONSTANT("VK_W",                   0x57, CONST_CS|CONST_PERSISTENT); // W key
-	REGISTER_LONG_CONSTANT("VK_X",                   0x58, CONST_CS|CONST_PERSISTENT); // X key
-	REGISTER_LONG_CONSTANT("VK_Y",                   0x59, CONST_CS|CONST_PERSISTENT); // Y key
-	REGISTER_LONG_CONSTANT("VK_Z",                   0x5A, CONST_CS|CONST_PERSISTENT); // Z key
+	if(!constant_exists("VK_LBUTTON"))             REGISTER_LONG_CONSTANT("VK_LBUTTON",             0x01, CONST_CS|CONST_PERSISTENT); // Left mouse button
+	if(!constant_exists("VK_RBUTTON"))             REGISTER_LONG_CONSTANT("VK_RBUTTON",             0x02, CONST_CS|CONST_PERSISTENT); // Right mouse button
+	if(!constant_exists("VK_CANCEL"))              REGISTER_LONG_CONSTANT("VK_CANCEL",              0x03, CONST_CS|CONST_PERSISTENT); // Control-break processing
+	if(!constant_exists("VK_MBUTTON"))             REGISTER_LONG_CONSTANT("VK_MBUTTON",             0x04, CONST_CS|CONST_PERSISTENT); // Middle mouse button (three-button mouse)
+	if(!constant_exists("VK_XBUTTON1"))            REGISTER_LONG_CONSTANT("VK_XBUTTON1",            0x05, CONST_CS|CONST_PERSISTENT); // X1 mouse button
+	if(!constant_exists("VK_XBUTTON2"))            REGISTER_LONG_CONSTANT("VK_XBUTTON2",            0x06, CONST_CS|CONST_PERSISTENT); // X2 mouse button                   
+	if(!constant_exists("VK_BACK"))                REGISTER_LONG_CONSTANT("VK_BACK",                0x08, CONST_CS|CONST_PERSISTENT); // BACKSPACE key
+	if(!constant_exists("VK_TAB"))                 REGISTER_LONG_CONSTANT("VK_TAB",                 0x09, CONST_CS|CONST_PERSISTENT); // TAB key
+	if(!constant_exists("VK_CLEAR"))               REGISTER_LONG_CONSTANT("VK_CLEAR",               0x0C, CONST_CS|CONST_PERSISTENT); // CLEAR key
+	if(!constant_exists("VK_RETURN"))              REGISTER_LONG_CONSTANT("VK_RETURN",              0x0D, CONST_CS|CONST_PERSISTENT); // ENTER key
+	if(!constant_exists("VK_SHIFT"))               REGISTER_LONG_CONSTANT("VK_SHIFT",               0x10, CONST_CS|CONST_PERSISTENT); // SHIFT key
+	if(!constant_exists("VK_CONTROL"))             REGISTER_LONG_CONSTANT("VK_CONTROL",             0x11, CONST_CS|CONST_PERSISTENT); // CTRL key
+	if(!constant_exists("VK_MENU"))                REGISTER_LONG_CONSTANT("VK_MENU",                0x12, CONST_CS|CONST_PERSISTENT); // ALT key
+	if(!constant_exists("VK_PAUSE"))               REGISTER_LONG_CONSTANT("VK_PAUSE",               0x13, CONST_CS|CONST_PERSISTENT); // PAUSE key
+	if(!constant_exists("VK_CAPITAL"))             REGISTER_LONG_CONSTANT("VK_CAPITAL",             0x14, CONST_CS|CONST_PERSISTENT); // CAPS LOCK key
+	if(!constant_exists("VK_KANA"))                REGISTER_LONG_CONSTANT("VK_KANA",                0x15, CONST_CS|CONST_PERSISTENT); // IME Kana mode
+	if(!constant_exists("VK_HANGUEL"))             REGISTER_LONG_CONSTANT("VK_HANGUEL",             0x15, CONST_CS|CONST_PERSISTENT); // IME Hanguel mode (maintained for compatibility; use VK_HANGUL)
+	if(!constant_exists("VK_HANGUL"))              REGISTER_LONG_CONSTANT("VK_HANGUL",              0x15, CONST_CS|CONST_PERSISTENT); // IME Hangul mode
+	if(!constant_exists("VK_JUNJA"))               REGISTER_LONG_CONSTANT("VK_JUNJA",               0x17, CONST_CS|CONST_PERSISTENT); // IME Junja mode
+	if(!constant_exists("VK_FINAL"))               REGISTER_LONG_CONSTANT("VK_FINAL",               0x18, CONST_CS|CONST_PERSISTENT); // IME final mode
+	if(!constant_exists("VK_HANJA"))               REGISTER_LONG_CONSTANT("VK_HANJA",               0x19, CONST_CS|CONST_PERSISTENT); // IME Hanja mode
+	if(!constant_exists("VK_KANJI"))               REGISTER_LONG_CONSTANT("VK_KANJI",               0x19, CONST_CS|CONST_PERSISTENT); // IME Kanji mode
+	if(!constant_exists("VK_ESCAPE"))              REGISTER_LONG_CONSTANT("VK_ESCAPE",              0x1B, CONST_CS|CONST_PERSISTENT); // ESC key
+	if(!constant_exists("VK_CONVERT"))             REGISTER_LONG_CONSTANT("VK_CONVERT",             0x1C, CONST_CS|CONST_PERSISTENT); // IME convert
+	if(!constant_exists("VK_NONCONVERT"))          REGISTER_LONG_CONSTANT("VK_NONCONVERT",          0x1D, CONST_CS|CONST_PERSISTENT); // IME nonconvert
+	if(!constant_exists("VK_ACCEPT"))              REGISTER_LONG_CONSTANT("VK_ACCEPT",              0x1E, CONST_CS|CONST_PERSISTENT); // IME accept
+	if(!constant_exists("VK_MODECHANGE"))          REGISTER_LONG_CONSTANT("VK_MODECHANGE",          0x1F, CONST_CS|CONST_PERSISTENT); // IME mode change request
+	if(!constant_exists("VK_SPACE"))               REGISTER_LONG_CONSTANT("VK_SPACE",               0x20, CONST_CS|CONST_PERSISTENT); // SPACEBAR
+	if(!constant_exists("VK_PRIOR"))               REGISTER_LONG_CONSTANT("VK_PRIOR",               0x21, CONST_CS|CONST_PERSISTENT); // PAGE UP key
+	if(!constant_exists("VK_NEXT"))                REGISTER_LONG_CONSTANT("VK_NEXT",                0x22, CONST_CS|CONST_PERSISTENT); // PAGE DOWN key
+	if(!constant_exists("VK_END"))                 REGISTER_LONG_CONSTANT("VK_END",                 0x23, CONST_CS|CONST_PERSISTENT); // END key
+	if(!constant_exists("VK_HOME"))                REGISTER_LONG_CONSTANT("VK_HOME",                0x24, CONST_CS|CONST_PERSISTENT); // HOME key
+	if(!constant_exists("VK_LEFT"))                REGISTER_LONG_CONSTANT("VK_LEFT",                0x25, CONST_CS|CONST_PERSISTENT); // LEFT ARROW key
+	if(!constant_exists("VK_UP"))                  REGISTER_LONG_CONSTANT("VK_UP",                  0x26, CONST_CS|CONST_PERSISTENT); // UP ARROW key
+	if(!constant_exists("VK_RIGHT"))               REGISTER_LONG_CONSTANT("VK_RIGHT",               0x27, CONST_CS|CONST_PERSISTENT); // RIGHT ARROW key
+	if(!constant_exists("VK_DOWN"))                REGISTER_LONG_CONSTANT("VK_DOWN",                0x28, CONST_CS|CONST_PERSISTENT); // DOWN ARROW key
+	if(!constant_exists("VK_SELECT"))              REGISTER_LONG_CONSTANT("VK_SELECT",              0x29, CONST_CS|CONST_PERSISTENT); // SELECT key
+	if(!constant_exists("VK_PRINT"))               REGISTER_LONG_CONSTANT("VK_PRINT",               0x2A, CONST_CS|CONST_PERSISTENT); // PRINT key
+	if(!constant_exists("VK_EXECUTE"))             REGISTER_LONG_CONSTANT("VK_EXECUTE",             0x2B, CONST_CS|CONST_PERSISTENT); // EXECUTE key
+	if(!constant_exists("VK_SNAPSHOT"))            REGISTER_LONG_CONSTANT("VK_SNAPSHOT",            0x2C, CONST_CS|CONST_PERSISTENT); // PRINT SCREEN key
+	if(!constant_exists("VK_INSERT"))              REGISTER_LONG_CONSTANT("VK_INSERT",              0x2D, CONST_CS|CONST_PERSISTENT); // INS key
+	if(!constant_exists("VK_DELETE"))              REGISTER_LONG_CONSTANT("VK_DELETE",              0x2E, CONST_CS|CONST_PERSISTENT); // DEL key
+	if(!constant_exists("VK_HELP"))                REGISTER_LONG_CONSTANT("VK_HELP",                0x2F, CONST_CS|CONST_PERSISTENT); // HELP key
+	if(!constant_exists("VK_LWIN"))                REGISTER_LONG_CONSTANT("VK_LWIN",                0x5B, CONST_CS|CONST_PERSISTENT); // Left Windows key (Natural keyboard)
+	if(!constant_exists("VK_RWIN"))                REGISTER_LONG_CONSTANT("VK_RWIN",                0x5C, CONST_CS|CONST_PERSISTENT); // Right Windows key (Natural keyboard)
+	if(!constant_exists("VK_APPS"))                REGISTER_LONG_CONSTANT("VK_APPS",                0x5D, CONST_CS|CONST_PERSISTENT); // Applications key (Natural keyboard)
+	if(!constant_exists("VK_SLEEP"))               REGISTER_LONG_CONSTANT("VK_SLEEP",               0x5F, CONST_CS|CONST_PERSISTENT); // Computer Sleep key
+	if(!constant_exists("VK_NUMPAD0"))             REGISTER_LONG_CONSTANT("VK_NUMPAD0",             0x60, CONST_CS|CONST_PERSISTENT); // Numeric keypad 0 key
+	if(!constant_exists("VK_NUMPAD1"))             REGISTER_LONG_CONSTANT("VK_NUMPAD1",             0x61, CONST_CS|CONST_PERSISTENT); // Numeric keypad 1 key
+	if(!constant_exists("VK_NUMPAD2"))             REGISTER_LONG_CONSTANT("VK_NUMPAD2",             0x62, CONST_CS|CONST_PERSISTENT); // Numeric keypad 2 key
+	if(!constant_exists("VK_NUMPAD3"))             REGISTER_LONG_CONSTANT("VK_NUMPAD3",             0x63, CONST_CS|CONST_PERSISTENT); // Numeric keypad 3 key
+	if(!constant_exists("VK_NUMPAD4"))             REGISTER_LONG_CONSTANT("VK_NUMPAD4",             0x64, CONST_CS|CONST_PERSISTENT); // Numeric keypad 4 key
+	if(!constant_exists("VK_NUMPAD5"))             REGISTER_LONG_CONSTANT("VK_NUMPAD5",             0x65, CONST_CS|CONST_PERSISTENT); // Numeric keypad 5 key
+	if(!constant_exists("VK_NUMPAD6"))             REGISTER_LONG_CONSTANT("VK_NUMPAD6",             0x66, CONST_CS|CONST_PERSISTENT); // Numeric keypad 6 key
+	if(!constant_exists("VK_NUMPAD7"))             REGISTER_LONG_CONSTANT("VK_NUMPAD7",             0x67, CONST_CS|CONST_PERSISTENT); // Numeric keypad 7 key
+	if(!constant_exists("VK_NUMPAD8"))             REGISTER_LONG_CONSTANT("VK_NUMPAD8",             0x68, CONST_CS|CONST_PERSISTENT); // Numeric keypad 8 key
+	if(!constant_exists("VK_NUMPAD9"))             REGISTER_LONG_CONSTANT("VK_NUMPAD9",             0x69, CONST_CS|CONST_PERSISTENT); // Numeric keypad 9 key
+	if(!constant_exists("VK_MULTIPLY"))            REGISTER_LONG_CONSTANT("VK_MULTIPLY",            0x6A, CONST_CS|CONST_PERSISTENT); // Multiply key
+	if(!constant_exists("VK_ADD"))                 REGISTER_LONG_CONSTANT("VK_ADD",                 0x6B, CONST_CS|CONST_PERSISTENT); // Add key
+	if(!constant_exists("VK_SEPARATOR"))           REGISTER_LONG_CONSTANT("VK_SEPARATOR",           0x6C, CONST_CS|CONST_PERSISTENT); // Separator key
+	if(!constant_exists("VK_SUBTRACT"))            REGISTER_LONG_CONSTANT("VK_SUBTRACT",            0x6D, CONST_CS|CONST_PERSISTENT); // Subtract key
+	if(!constant_exists("VK_DECIMAL"))             REGISTER_LONG_CONSTANT("VK_DECIMAL",             0x6E, CONST_CS|CONST_PERSISTENT); // Decimal key
+	if(!constant_exists("VK_DIVIDE"))              REGISTER_LONG_CONSTANT("VK_DIVIDE",              0x6F, CONST_CS|CONST_PERSISTENT); // Divide key
+	if(!constant_exists("VK_F1"))                  REGISTER_LONG_CONSTANT("VK_F1",                  0x70, CONST_CS|CONST_PERSISTENT); // F1 key
+	if(!constant_exists("VK_F2"))                  REGISTER_LONG_CONSTANT("VK_F2",                  0x71, CONST_CS|CONST_PERSISTENT); // F2 key
+	if(!constant_exists("VK_F3"))                  REGISTER_LONG_CONSTANT("VK_F3",                  0x72, CONST_CS|CONST_PERSISTENT); // F3 key
+	if(!constant_exists("VK_F4"))                  REGISTER_LONG_CONSTANT("VK_F4",                  0x73, CONST_CS|CONST_PERSISTENT); // F4 key
+	if(!constant_exists("VK_F5"))                  REGISTER_LONG_CONSTANT("VK_F5",                  0x74, CONST_CS|CONST_PERSISTENT); // F5 key
+	if(!constant_exists("VK_F6"))                  REGISTER_LONG_CONSTANT("VK_F6",                  0x75, CONST_CS|CONST_PERSISTENT); // F6 key
+	if(!constant_exists("VK_F7"))                  REGISTER_LONG_CONSTANT("VK_F7",                  0x76, CONST_CS|CONST_PERSISTENT); // F7 key
+	if(!constant_exists("VK_F8"))                  REGISTER_LONG_CONSTANT("VK_F8",                  0x77, CONST_CS|CONST_PERSISTENT); // F8 key
+	if(!constant_exists("VK_F9"))                  REGISTER_LONG_CONSTANT("VK_F9",                  0x78, CONST_CS|CONST_PERSISTENT); // F9 key
+	if(!constant_exists("VK_F10"))                 REGISTER_LONG_CONSTANT("VK_F10",                 0x79, CONST_CS|CONST_PERSISTENT); // F10 key
+	if(!constant_exists("VK_F11"))                 REGISTER_LONG_CONSTANT("VK_F11",                 0x7A, CONST_CS|CONST_PERSISTENT); // F11 key
+	if(!constant_exists("VK_F12"))                 REGISTER_LONG_CONSTANT("VK_F12",                 0x7B, CONST_CS|CONST_PERSISTENT); // F12 key
+	if(!constant_exists("VK_F13"))                 REGISTER_LONG_CONSTANT("VK_F13",                 0x7C, CONST_CS|CONST_PERSISTENT); // F13 key
+	if(!constant_exists("VK_F14"))                 REGISTER_LONG_CONSTANT("VK_F14",                 0x7D, CONST_CS|CONST_PERSISTENT); // F14 key
+	if(!constant_exists("VK_F15"))                 REGISTER_LONG_CONSTANT("VK_F15",                 0x7E, CONST_CS|CONST_PERSISTENT); // F15 key
+	if(!constant_exists("VK_F16"))                 REGISTER_LONG_CONSTANT("VK_F16",                 0x7F, CONST_CS|CONST_PERSISTENT); // F16 key
+	if(!constant_exists("VK_F17"))                 REGISTER_LONG_CONSTANT("VK_F17",                 0x80, CONST_CS|CONST_PERSISTENT); // F17 key
+	if(!constant_exists("VK_F18"))                 REGISTER_LONG_CONSTANT("VK_F18",                 0x81, CONST_CS|CONST_PERSISTENT); // F18 key
+	if(!constant_exists("VK_F19"))                 REGISTER_LONG_CONSTANT("VK_F19",                 0x82, CONST_CS|CONST_PERSISTENT); // F19 key
+	if(!constant_exists("VK_F20"))                 REGISTER_LONG_CONSTANT("VK_F20",                 0x83, CONST_CS|CONST_PERSISTENT); // F20 key
+	if(!constant_exists("VK_F21"))                 REGISTER_LONG_CONSTANT("VK_F21",                 0x84, CONST_CS|CONST_PERSISTENT); // F21 key
+	if(!constant_exists("VK_F22"))                 REGISTER_LONG_CONSTANT("VK_F22",                 0x85, CONST_CS|CONST_PERSISTENT); // F22 key
+	if(!constant_exists("VK_F23"))                 REGISTER_LONG_CONSTANT("VK_F23",                 0x86, CONST_CS|CONST_PERSISTENT); // F23 key
+	if(!constant_exists("VK_F24"))                 REGISTER_LONG_CONSTANT("VK_F24",                 0x87, CONST_CS|CONST_PERSISTENT); // F24 key
+	if(!constant_exists("VK_NUMLOCK"))             REGISTER_LONG_CONSTANT("VK_NUMLOCK",             0x90, CONST_CS|CONST_PERSISTENT); // NUM LOCK key
+	if(!constant_exists("VK_SCROLL"))              REGISTER_LONG_CONSTANT("VK_SCROLL",              0x91, CONST_CS|CONST_PERSISTENT); // SCROLL LOCK key
+	if(!constant_exists("VK_LSHIFT"))              REGISTER_LONG_CONSTANT("VK_LSHIFT",              0xA0, CONST_CS|CONST_PERSISTENT); // Left SHIFT key
+	if(!constant_exists("VK_RSHIFT"))              REGISTER_LONG_CONSTANT("VK_RSHIFT",              0xA1, CONST_CS|CONST_PERSISTENT); // Right SHIFT key
+	if(!constant_exists("VK_LCONTROL"))            REGISTER_LONG_CONSTANT("VK_LCONTROL",            0xA2, CONST_CS|CONST_PERSISTENT); // Left CONTROL key
+	if(!constant_exists("VK_RCONTROL"))            REGISTER_LONG_CONSTANT("VK_RCONTROL",            0xA3, CONST_CS|CONST_PERSISTENT); // Right CONTROL key
+	if(!constant_exists("VK_LMENU"))               REGISTER_LONG_CONSTANT("VK_LMENU",               0xA4, CONST_CS|CONST_PERSISTENT); // Left MENU key
+	if(!constant_exists("VK_RMENU"))               REGISTER_LONG_CONSTANT("VK_RMENU",               0xA5, CONST_CS|CONST_PERSISTENT); // Right MENU key
+	if(!constant_exists("VK_BROWSER_BACK"))        REGISTER_LONG_CONSTANT("VK_BROWSER_BACK",        0xA6, CONST_CS|CONST_PERSISTENT); // Browser Back key
+	if(!constant_exists("VK_BROWSER_FORWARD"))     REGISTER_LONG_CONSTANT("VK_BROWSER_FORWARD",     0xA7, CONST_CS|CONST_PERSISTENT); // Browser Forward key
+	if(!constant_exists("VK_BROWSER_REFRESH"))     REGISTER_LONG_CONSTANT("VK_BROWSER_REFRESH",     0xA8, CONST_CS|CONST_PERSISTENT); // Browser Refresh key
+	if(!constant_exists("VK_BROWSER_STOP"))        REGISTER_LONG_CONSTANT("VK_BROWSER_STOP",        0xA9, CONST_CS|CONST_PERSISTENT); // Browser Stop key
+	if(!constant_exists("VK_BROWSER_SEARCH"))      REGISTER_LONG_CONSTANT("VK_BROWSER_SEARCH",      0xAA, CONST_CS|CONST_PERSISTENT); // Browser Search key
+	if(!constant_exists("VK_BROWSER_FAVORITES"))   REGISTER_LONG_CONSTANT("VK_BROWSER_FAVORITES",   0xAB, CONST_CS|CONST_PERSISTENT); // Browser Favorites key
+	if(!constant_exists("VK_BROWSER_HOME"))        REGISTER_LONG_CONSTANT("VK_BROWSER_HOME",        0xAC, CONST_CS|CONST_PERSISTENT); // Browser Start and Home key
+	if(!constant_exists("VK_VOLUME_MUTE"))         REGISTER_LONG_CONSTANT("VK_VOLUME_MUTE",         0xAD, CONST_CS|CONST_PERSISTENT); // Volume Mute key
+	if(!constant_exists("VK_VOLUME_DOWN"))         REGISTER_LONG_CONSTANT("VK_VOLUME_DOWN",         0xAE, CONST_CS|CONST_PERSISTENT); // Volume Down key
+	if(!constant_exists("VK_VOLUME_UP"))           REGISTER_LONG_CONSTANT("VK_VOLUME_UP",           0xAF, CONST_CS|CONST_PERSISTENT); // Volume Up key
+	if(!constant_exists("VK_MEDIA_NEXT_TRACK"))    REGISTER_LONG_CONSTANT("VK_MEDIA_NEXT_TRACK",    0xB0, CONST_CS|CONST_PERSISTENT); // Next Track key
+	if(!constant_exists("VK_MEDIA_PREV_TRACK"))    REGISTER_LONG_CONSTANT("VK_MEDIA_PREV_TRACK",    0xB1, CONST_CS|CONST_PERSISTENT); // Previous Track key
+	if(!constant_exists("VK_MEDIA_STOP"))          REGISTER_LONG_CONSTANT("VK_MEDIA_STOP",          0xB2, CONST_CS|CONST_PERSISTENT); // Stop Media key
+	if(!constant_exists("VK_MEDIA_PLAY_PAUSE"))    REGISTER_LONG_CONSTANT("VK_MEDIA_PLAY_PAUSE",    0xB3, CONST_CS|CONST_PERSISTENT); // Play/Pause Media key
+	if(!constant_exists("VK_LAUNCH_MAIL"))         REGISTER_LONG_CONSTANT("VK_LAUNCH_MAIL",         0xB4, CONST_CS|CONST_PERSISTENT); // Start Mail key
+	if(!constant_exists("VK_LAUNCH_MEDIA_SELECT")) REGISTER_LONG_CONSTANT("VK_LAUNCH_MEDIA_SELECT", 0xB5, CONST_CS|CONST_PERSISTENT); // Select Media key
+	if(!constant_exists("VK_LAUNCH_APP1"))         REGISTER_LONG_CONSTANT("VK_LAUNCH_APP1",         0xB6, CONST_CS|CONST_PERSISTENT); // Start Application 1 key
+	if(!constant_exists("VK_LAUNCH_APP2"))         REGISTER_LONG_CONSTANT("VK_LAUNCH_APP2",         0xB7, CONST_CS|CONST_PERSISTENT); // Start Application 2 key
+	if(!constant_exists("VK_OEM_1"))               REGISTER_LONG_CONSTANT("VK_OEM_1",               0xBA, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the ';:' key
+	if(!constant_exists("VK_OEM_PLUS"))            REGISTER_LONG_CONSTANT("VK_OEM_PLUS",            0xBB, CONST_CS|CONST_PERSISTENT); // For any country/region, the '+' key
+	if(!constant_exists("VK_OEM_COMMA"))           REGISTER_LONG_CONSTANT("VK_OEM_COMMA",           0xBC, CONST_CS|CONST_PERSISTENT); // For any country/region, the ',' key
+	if(!constant_exists("VK_OEM_MINUS"))           REGISTER_LONG_CONSTANT("VK_OEM_MINUS",           0xBD, CONST_CS|CONST_PERSISTENT); // For any country/region, the '-' key
+	if(!constant_exists("VK_OEM_PERIOD"))          REGISTER_LONG_CONSTANT("VK_OEM_PERIOD",          0xBE, CONST_CS|CONST_PERSISTENT); // For any country/region, the '.' key
+	if(!constant_exists("VK_OEM_2"))               REGISTER_LONG_CONSTANT("VK_OEM_2",               0xBF, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the '/?' key
+	if(!constant_exists("VK_OEM_3"))               REGISTER_LONG_CONSTANT("VK_OEM_3",               0xC0, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the '`~' key
+	if(!constant_exists("VK_OEM_4"))               REGISTER_LONG_CONSTANT("VK_OEM_4",               0xDB, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the '[{' key
+	if(!constant_exists("VK_OEM_5"))               REGISTER_LONG_CONSTANT("VK_OEM_5",               0xDC, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the '\|' key
+	if(!constant_exists("VK_OEM_6"))               REGISTER_LONG_CONSTANT("VK_OEM_6",               0xDD, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the ']}' key
+	if(!constant_exists("VK_OEM_7"))               REGISTER_LONG_CONSTANT("VK_OEM_7",               0xDE, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the 'single-quote/double-quote' key
+	if(!constant_exists("VK_OEM_8"))               REGISTER_LONG_CONSTANT("VK_OEM_8",               0xDF, CONST_CS|CONST_PERSISTENT); // Used for miscellaneous characters; it can vary by keyboard.
+	if(!constant_exists("VK_OEM_102"))             REGISTER_LONG_CONSTANT("VK_OEM_102",             0xE2, CONST_CS|CONST_PERSISTENT); // Either the angle bracket key or the backslash key on the RT 102-key keyboard
+	if(!constant_exists("VK_PROCESSKEY"))          REGISTER_LONG_CONSTANT("VK_PROCESSKEY",          0xE5, CONST_CS|CONST_PERSISTENT); // IME PROCESS key
+	if(!constant_exists("VK_PACKET"))              REGISTER_LONG_CONSTANT("VK_PACKET",              0xE7, CONST_CS|CONST_PERSISTENT); // Used to pass Unicode characters as if they were keystrokes. The VK_PACKET key is the low word of a 32-bit Virtual Key value used for non-keyboard input methods. For more information, see Remark in KEYBDINPUT, SendInput, WM_KEYDOWN, and WM_KEYUP
+	if(!constant_exists("VK_ATTN"))                REGISTER_LONG_CONSTANT("VK_ATTN",                0xF6, CONST_CS|CONST_PERSISTENT); // Attn key
+	if(!constant_exists("VK_CRSEL"))               REGISTER_LONG_CONSTANT("VK_CRSEL",               0xF7, CONST_CS|CONST_PERSISTENT); // CrSel key
+	if(!constant_exists("VK_EXSEL"))               REGISTER_LONG_CONSTANT("VK_EXSEL",               0xF8, CONST_CS|CONST_PERSISTENT); // ExSel key
+	if(!constant_exists("VK_EREOF"))               REGISTER_LONG_CONSTANT("VK_EREOF",               0xF9, CONST_CS|CONST_PERSISTENT); // Erase EOF key
+	if(!constant_exists("VK_PLAY"))                REGISTER_LONG_CONSTANT("VK_PLAY",                0xFA, CONST_CS|CONST_PERSISTENT); // Play key
+	if(!constant_exists("VK_ZOOM"))                REGISTER_LONG_CONSTANT("VK_ZOOM",                0xFB, CONST_CS|CONST_PERSISTENT); // Zoom key
+	if(!constant_exists("VK_NONAME"))              REGISTER_LONG_CONSTANT("VK_NONAME",              0xFC, CONST_CS|CONST_PERSISTENT); // Reserved
+	if(!constant_exists("VK_PA1"))                 REGISTER_LONG_CONSTANT("VK_PA1",                 0xFD, CONST_CS|CONST_PERSISTENT); // PA1 key
+	if(!constant_exists("VK_OEM_CLEAR"))           REGISTER_LONG_CONSTANT("VK_OEM_CLEAR",           0xFE, CONST_CS|CONST_PERSISTENT); // Clear key
+	if(!constant_exists("VK_0"))                   REGISTER_LONG_CONSTANT("VK_0",                   0x30, CONST_CS|CONST_PERSISTENT); // 0 key
+	if(!constant_exists("VK_1"))                   REGISTER_LONG_CONSTANT("VK_1",                   0x31, CONST_CS|CONST_PERSISTENT); // 1 key
+	if(!constant_exists("VK_2"))                   REGISTER_LONG_CONSTANT("VK_2",                   0x32, CONST_CS|CONST_PERSISTENT); // 2 key
+	if(!constant_exists("VK_3"))                   REGISTER_LONG_CONSTANT("VK_3",                   0x33, CONST_CS|CONST_PERSISTENT); // 3 key
+	if(!constant_exists("VK_4"))                   REGISTER_LONG_CONSTANT("VK_4",                   0x34, CONST_CS|CONST_PERSISTENT); // 4 key
+	if(!constant_exists("VK_5"))                   REGISTER_LONG_CONSTANT("VK_5",                   0x35, CONST_CS|CONST_PERSISTENT); // 5 key
+	if(!constant_exists("VK_6"))                   REGISTER_LONG_CONSTANT("VK_6",                   0x36, CONST_CS|CONST_PERSISTENT); // 6 key
+	if(!constant_exists("VK_7"))                   REGISTER_LONG_CONSTANT("VK_7",                   0x37, CONST_CS|CONST_PERSISTENT); // 7 key
+	if(!constant_exists("VK_8"))                   REGISTER_LONG_CONSTANT("VK_8",                   0x38, CONST_CS|CONST_PERSISTENT); // 8 key
+	if(!constant_exists("VK_9"))                   REGISTER_LONG_CONSTANT("VK_9",                   0x39, CONST_CS|CONST_PERSISTENT); // 9 key
+	if(!constant_exists("VK_A"))                   REGISTER_LONG_CONSTANT("VK_A",                   0x41, CONST_CS|CONST_PERSISTENT); // A key
+	if(!constant_exists("VK_B"))                   REGISTER_LONG_CONSTANT("VK_B",                   0x42, CONST_CS|CONST_PERSISTENT); // B key
+	if(!constant_exists("VK_C"))                   REGISTER_LONG_CONSTANT("VK_C",                   0x43, CONST_CS|CONST_PERSISTENT); // C key
+	if(!constant_exists("VK_D"))                   REGISTER_LONG_CONSTANT("VK_D",                   0x44, CONST_CS|CONST_PERSISTENT); // D key
+	if(!constant_exists("VK_E"))                   REGISTER_LONG_CONSTANT("VK_E",                   0x45, CONST_CS|CONST_PERSISTENT); // E key
+	if(!constant_exists("VK_F"))                   REGISTER_LONG_CONSTANT("VK_F",                   0x46, CONST_CS|CONST_PERSISTENT); // F key
+	if(!constant_exists("VK_G"))                   REGISTER_LONG_CONSTANT("VK_G",                   0x47, CONST_CS|CONST_PERSISTENT); // G key
+	if(!constant_exists("VK_H"))                   REGISTER_LONG_CONSTANT("VK_H",                   0x48, CONST_CS|CONST_PERSISTENT); // H key
+	if(!constant_exists("VK_I"))                   REGISTER_LONG_CONSTANT("VK_I",                   0x49, CONST_CS|CONST_PERSISTENT); // I key
+	if(!constant_exists("VK_J"))                   REGISTER_LONG_CONSTANT("VK_J",                   0x4A, CONST_CS|CONST_PERSISTENT); // J key
+	if(!constant_exists("VK_K"))                   REGISTER_LONG_CONSTANT("VK_K",                   0x4B, CONST_CS|CONST_PERSISTENT); // K key
+	if(!constant_exists("VK_L"))                   REGISTER_LONG_CONSTANT("VK_L",                   0x4C, CONST_CS|CONST_PERSISTENT); // L key
+	if(!constant_exists("VK_M"))                   REGISTER_LONG_CONSTANT("VK_M",                   0x4D, CONST_CS|CONST_PERSISTENT); // M key
+	if(!constant_exists("VK_N"))                   REGISTER_LONG_CONSTANT("VK_N",                   0x4E, CONST_CS|CONST_PERSISTENT); // N key
+	if(!constant_exists("VK_O"))                   REGISTER_LONG_CONSTANT("VK_O",                   0x4F, CONST_CS|CONST_PERSISTENT); // O key
+	if(!constant_exists("VK_P"))                   REGISTER_LONG_CONSTANT("VK_P",                   0x50, CONST_CS|CONST_PERSISTENT); // P key
+	if(!constant_exists("VK_Q"))                   REGISTER_LONG_CONSTANT("VK_Q",                   0x51, CONST_CS|CONST_PERSISTENT); // Q key
+	if(!constant_exists("VK_R"))                   REGISTER_LONG_CONSTANT("VK_R",                   0x52, CONST_CS|CONST_PERSISTENT); // R key
+	if(!constant_exists("VK_S"))                   REGISTER_LONG_CONSTANT("VK_S",                   0x53, CONST_CS|CONST_PERSISTENT); // S key
+	if(!constant_exists("VK_T"))                   REGISTER_LONG_CONSTANT("VK_T",                   0x54, CONST_CS|CONST_PERSISTENT); // T key
+	if(!constant_exists("VK_U"))                   REGISTER_LONG_CONSTANT("VK_U",                   0x55, CONST_CS|CONST_PERSISTENT); // U key
+	if(!constant_exists("VK_V"))                   REGISTER_LONG_CONSTANT("VK_V",                   0x56, CONST_CS|CONST_PERSISTENT); // V key
+	if(!constant_exists("VK_W"))                   REGISTER_LONG_CONSTANT("VK_W",                   0x57, CONST_CS|CONST_PERSISTENT); // W key
+	if(!constant_exists("VK_X"))                   REGISTER_LONG_CONSTANT("VK_X",                   0x58, CONST_CS|CONST_PERSISTENT); // X key
+	if(!constant_exists("VK_Y"))                   REGISTER_LONG_CONSTANT("VK_Y",                   0x59, CONST_CS|CONST_PERSISTENT); // Y key
+	if(!constant_exists("VK_Z"))                   REGISTER_LONG_CONSTANT("VK_Z",                   0x5A, CONST_CS|CONST_PERSISTENT); // Z key
 
 	// INIT GLOBALS
 	ZEND_INIT_MODULE_GLOBALS(wcli, php_wcli_init_globals, NULL);
@@ -1491,4 +1499,12 @@ static char *WideChar2Utf8(LPCWCH wcs, int *plen)
 	}
 
 	return str;
+}
+
+
+// Verify if a constant exists
+static BOOL constant_exists(char *name)
+{
+	if(zend_get_constant_str(name, strlen(name))) return TRUE;
+	else return FALSE;
 }
