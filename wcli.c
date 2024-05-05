@@ -88,10 +88,6 @@ PHP_MINFO_FUNCTION(wcli)
 
 PHP_MINIT_FUNCTION(wcli)
 {
-	// bool exists;
-	// zend_constant c;
-
-	zval *sid;
 
 	// COLORS
 	REGISTER_LONG_CONSTANT("Red",    FOREGROUND_RED, CONST_CS|CONST_PERSISTENT);
