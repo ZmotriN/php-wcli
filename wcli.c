@@ -1270,7 +1270,6 @@ ZEND_FUNCTION(wcli_where)
 {
 	char *file;
 	size_t file_size;
-
 	char *buffer;
 	int buffer_size;
 	wchar_t *wext;
