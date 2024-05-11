@@ -1271,29 +1271,51 @@ ZEND_FUNCTION(wcli_is_cmd_call)
 
 ZEND_FUNCTION(wcli_where)
 {
+	// char *file;
+	// size_t file_size;
+	// char *buffer;
+	// int buffer_size;
+	// wchar_t *wext;
+	// wchar_t *wfile;
+	// wchar_t wbuffer[MAXPATHLEN];
+	// wchar_t realfile[MAXPATHLEN];
+
+
+	char *ext;
 	char *file;
-	size_t file_size;
-	char *buffer;
-	int buffer_size;
-	wchar_t *wext;
-	wchar_t *wfile;
-	wchar_t wbuffer[MAXPATHLEN];
-	wchar_t realfile[MAXPATHLEN];
+	int file_size;
+	DWORD bytes;
 
 	ZEND_PARSE_PARAMETERS_START(1, 1)
 		Z_PARAM_STRING(file, file_size)
 	ZEND_PARSE_PARAMETERS_END();
 
-	wfile = Utf82WideChar(file, file_size);
-	wext = PathFindExtensionW(wfile);
 
-	if(wcscmp(wext, L"")) wcscpy(realfile, wfile);
-	else swprintf(realfile, MAXPATHLEN, L"%s.exe", wfile);
 
-	ZeroMemory(wbuffer, sizeof(wchar_t) * MAXPATHLEN);
-	if(!SearchPathW(NULL, realfile, NULL, MAXPATHLEN-1, wbuffer, NULL)) RETURN_BOOL(FALSE);
+	char buffer[MAXPATHLEN];
+	char realfile[MAXPATHLEN];
 
-	buffer = WideChar2Utf8(wbuffer, &buffer_size);
+
+	// wfile = Utf82WideChar(file, file_size);
+	// wext = PathFindExtensionW(wfile);
+
+	// if(wcscmp(wext, L"")) wcscpy(realfile, wfile);
+	// else swprintf(realfile, MAXPATHLEN, L"%s.exe", wfile);
+
+	// ZeroMemory(wbuffer, sizeof(wchar_t) * MAXPATHLEN);
+	// if(!SearchPathW(NULL, realfile, NULL, MAXPATHLEN-1, wbuffer, NULL)) RETURN_BOOL(FALSE);
+
+	// buffer = WideChar2Utf8(wbuffer, &buffer_size);
+
+
+	ext = PathFindExtensionA(file);
+	if(strcasecmp(ext,"")) strcpy(realfile, file);
+	else sprintf(realfile,"%s.exe", file);
+
+	ZeroMemory(buffer,MAXPATHLEN);
+	if(!SearchPathA(NULL,realfile,NULL,MAXPATHLEN-1,buffer,NULL)) RETURN_FALSE;
+
+
 	RETURN_STRING(buffer);
 }
 
